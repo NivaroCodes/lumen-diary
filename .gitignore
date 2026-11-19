@@ -1,0 +1,34 @@
+# Node.js, Vite и TypeScript
+node_modules/
+.vite/
+*.tsbuildinfo
+
+# Сборки, отчёты о покрытии и логи
+dist/
+dist-ssr/
+build/
+coverage/
+*.log
+
+# Python и FastAPI
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+
+# IDE и системные файлы
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Локальное окружение и секреты
+.env
+.env.*
+!.env.example
