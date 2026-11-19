@@ -1,0 +1,17 @@
+:root {
+    --color-background: #101010;
+    --color-surface: #1a1a1a;
+    --color-surface-hover: #242424;
+    --color-text: #f5f2eb;
+    --color-text-muted: #a3a3a3;
+    --color-accent: #d4b483;
+    --color-border: #303030;
+
+    --font-sans: Arial, sans-serif;
+    --font-serif: Georgia, serif;
+    --font-mono: monospace;
+
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+}
