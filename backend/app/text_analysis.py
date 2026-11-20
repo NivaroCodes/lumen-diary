@@ -92,7 +92,8 @@ def _tokens(text: str) -> list[str]:
 
 
 def _match(token: str, stems: tuple[str, ...]) -> bool:
-    for stem in stems:
+    token = token.replace("ё", "е")  # «ё» и «е» считаем одной буквой
+    for stem in (s.replace("ё", "е") for s in stems):
         if stem.endswith("$"):
             if token == stem[:-1]:
                 return True
