@@ -24,6 +24,7 @@ MAX_DESCRIPTION = 300
 MAX_META = 200
 MAX_GENRE = 40
 MIN_YEAR = 1900
+GENRES = {"ambient", "pop", "rock", "electronic", "jazz", "classical", "hip-hop", "folk", "other", "unknown"}
 MODES = {"major", "minor", "unknown"}
 
 
@@ -162,8 +163,8 @@ def validate_music(form: Mapping[str, Any]) -> MusicInput:
     genre = _optional(form, "music_genre")
     if genre is not None:
         genre = genre.lower()
-        if len(genre) > MAX_GENRE:
-            raise validation_error("music_genre", f"Жанр не длиннее {MAX_GENRE} символов")
+        if genre not in GENRES:
+            raise validation_error("music_genre", "Жанр: " + ", ".join(sorted(GENRES)))
 
     tempo: float | None = None
     raw_tempo = _optional(form, "music_tempo_bpm")

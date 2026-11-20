@@ -1,9 +1,12 @@
 {
   "id": "day-calm-001",
-  "title": "Вечер под дождём",
+  "title": "Вечер, чай и дождь",
   "date": "2026-11-14",
   "text": "Вечером шёл дождь. Заварила чай, села у окна и просто читала. Один звонок от мамы, и тихо до ночи.",
-  "photos": ["/media/day-calm-001/photo-1.jpg", "/media/day-calm-001/photo-2.jpg"],
+  "photos": [
+    "/media/day-calm-001/photo-1.jpg",
+    "/media/day-calm-001/photo-2.jpg"
+  ],
   "music": {
     "type": "link",
     "url": "https://example.com/song-calm",
@@ -12,38 +15,243 @@
   },
   "visual": {
     "schema_version": "1.0",
-    "seed": 1001,
-    "light": { "direction_deg": 270, "intensity": 0.44, "temperature_k": 3840 },
-    "palette": { "colors": ["#C98B4F", "#3B3A44", "#E8D2B0"], "saturation": 0.46 },
-    "density": { "value": 0.3, "elements": 5 },
-    "texture": { "grain": 0.33, "blur": 0.6, "weather": "rain" },
-    "line": { "trajectory": "falling", "amplitude": 0.3, "roughness": 0.33, "color_index": 0 },
-    "motion": { "reveal_ms": 2980, "pulse_ms": 882 },
-    "contrast": 0.56,
-    "caption": "Вечер под дождём"
+    "seed": 637036001,
+    "light": {
+      "direction_deg": 270,
+      "intensity": 0.59,
+      "temperature_k": 4180
+    },
+    "palette": {
+      "colors": [
+        "#3B3A44",
+        "#C98B4F",
+        "#E8D2B0"
+      ],
+      "saturation": 0.5
+    },
+    "density": {
+      "value": 0.26,
+      "elements": 5
+    },
+    "texture": {
+      "grain": 0.22,
+      "blur": 0.6,
+      "weather": "rain"
+    },
+    "line": {
+      "trajectory": "falling",
+      "amplitude": 0.3,
+      "roughness": 0.33,
+      "color_index": 0
+    },
+    "motion": {
+      "reveal_ms": 2980,
+      "pulse_ms": 882
+    },
+    "contrast": 0.6,
+    "caption": "Вечер, чай и дождь"
   },
   "explain": [
-    { "param": "light.direction_deg", "value": 270, "rule": "R-LIGHT-01", "source": "text.time_of_day", "input": "evening", "text_ru": "Вечер в тексте — свет сверху справа.", "provenance": "measured" },
-    { "param": "light.intensity", "value": 0.44, "rule": "R-LIGHT-02", "source": "photos.brightness", "input": 0.35, "text_ru": "Фото тёмные, поэтому свет приглушён.", "provenance": "measured" },
-    { "param": "light.temperature_k", "value": 3840, "rule": "R-LIGHT-03", "source": "photos.warmth", "input": 0.7, "text_ru": "Тёплый свет фото задаёт тёплую температуру.", "provenance": "measured" },
-    { "param": "palette.colors", "value": ["#C98B4F", "#3B3A44", "#E8D2B0"], "rule": "R-PAL-01", "source": "photos.dominant_colors", "input": ["#C98B4F", "#3B3A44", "#E8D2B0"], "text_ru": "Цвета взяты из доминирующих цветов фото.", "provenance": "measured" },
-    { "param": "palette.saturation", "value": 0.46, "rule": "R-PAL-02", "source": "photos.contrast", "input": 0.4, "text_ru": "Умеренный контраст фото даёт сдержанную насыщенность.", "provenance": "measured" },
-    { "param": "density.value", "value": 0.3, "rule": "R-DEN-01", "source": "text.events_count", "input": 1, "text_ru": "В тексте одно событие и небольшой объём, поэтому композиция разреженная.", "provenance": "measured" },
-    { "param": "density.elements", "value": 5, "rule": "R-DEN-02", "source": "density.value", "input": 0.3, "text_ru": "Мало элементов — больше пустого пространства.", "provenance": "measured" },
-    { "param": "texture.weather", "value": "rain", "rule": "R-TEX-01", "source": "text.weather", "input": "rain", "text_ru": "Дождь в тексте добавляет вертикальную фактуру.", "provenance": "measured" },
-    { "param": "texture.grain", "value": 0.33, "rule": "R-TEX-02", "source": "photos.brightness", "input": 0.35, "text_ru": "Тёмные фото получают больше зерна.", "provenance": "measured" },
-    { "param": "texture.blur", "value": 0.6, "rule": "R-TEX-03", "source": "music.tempo_bpm", "input": 68, "text_ru": "Медленный темп песни, введённый вами, делает изображение мягче.", "provenance": "entered" },
-    { "param": "line.trajectory", "value": "falling", "rule": "R-LINE-01", "source": "text.time_of_day", "input": "evening", "text_ru": "Вечер — линия идёт вниз, как день к концу.", "provenance": "measured" },
-    { "param": "line.amplitude", "value": 0.3, "rule": "R-LINE-02", "source": "music.energy", "input": 0.25, "text_ru": "Низкая энергия песни, введённая вами, задаёт небольшой размах линии.", "provenance": "entered" },
-    { "param": "line.roughness", "value": 0.33, "rule": "R-LINE-03", "source": "music.energy", "input": 0.25, "text_ru": "Спокойная музыка даёт гладкую линию.", "provenance": "entered" },
-    { "param": "line.color_index", "value": 0, "rule": "R-LINE-04", "source": "system", "input": null, "text_ru": "Линия всегда берёт первый цвет палитры, чтобы узнаваться в каждом дне.", "provenance": "measured" },
-    { "param": "motion.reveal_ms", "value": 2980, "rule": "R-MOT-01", "source": "music.tempo_bpm", "input": 68, "text_ru": "Медленный темп — длинная проявка.", "provenance": "entered" },
-    { "param": "motion.pulse_ms", "value": 882, "rule": "R-MOT-02", "source": "music.tempo_bpm", "input": 68, "text_ru": "Пульс движения соответствует медленному темпу.", "provenance": "entered" },
-    { "param": "contrast", "value": 0.56, "rule": "R-CON-01", "source": "music.mode", "input": "minor", "text_ru": "Минорный лад, введённый вами, и умеренный контраст фото.", "provenance": "entered" }
+    {
+      "param": "light.direction_deg",
+      "value": 270,
+      "rule": "R-LIGHT-01",
+      "source": "text.time_of_day",
+      "input": "evening",
+      "text_ru": "Вечер в тексте — свет с противоположной стороны, как на закате.",
+      "provenance": "measured"
+    },
+    {
+      "param": "light.intensity",
+      "value": 0.59,
+      "rule": "R-LIGHT-02",
+      "source": "photos.brightness",
+      "input": 0.5527,
+      "text_ru": "Средняя яркость фото даёт ровный свет.",
+      "provenance": "measured"
+    },
+    {
+      "param": "light.temperature_k",
+      "value": 4180,
+      "rule": "R-LIGHT-03",
+      "source": "photos.warmth",
+      "input": 0.6105,
+      "text_ru": "Тёплые цвета фото задают тёплую температуру света.",
+      "provenance": "measured"
+    },
+    {
+      "param": "palette.colors",
+      "value": [
+        "#3B3A44",
+        "#C98B4F",
+        "#E8D2B0"
+      ],
+      "rule": "R-PAL-01",
+      "source": "photos.dominant_colors",
+      "input": [
+        "#3B3A44",
+        "#C98B4F",
+        "#E8D2B0"
+      ],
+      "text_ru": "Цвета взяты из доминирующих цветов фото.",
+      "provenance": "measured"
+    },
+    {
+      "param": "palette.saturation",
+      "value": 0.5,
+      "rule": "R-PAL-02",
+      "source": "photos.contrast",
+      "input": 0.4918,
+      "text_ru": "Умеренный контраст фото даёт сдержанную насыщенность.",
+      "provenance": "measured"
+    },
+    {
+      "param": "density.value",
+      "value": 0.26,
+      "rule": "R-DEN-01",
+      "source": "text.events_count",
+      "input": 2,
+      "text_ru": "В тексте событий: 2, слов: 19. Немного событий — композиция разреженная.",
+      "provenance": "measured"
+    },
+    {
+      "param": "density.elements",
+      "value": 5,
+      "rule": "R-DEN-02",
+      "source": "density.value",
+      "input": 0.26,
+      "text_ru": "Мало элементов — больше пустого пространства.",
+      "provenance": "measured"
+    },
+    {
+      "param": "texture.weather",
+      "value": "rain",
+      "rule": "R-TEX-01",
+      "source": "text.weather",
+      "input": "rain",
+      "text_ru": "Дождь в тексте добавляет вертикальную фактуру.",
+      "provenance": "measured"
+    },
+    {
+      "param": "texture.grain",
+      "value": 0.22,
+      "rule": "R-TEX-02",
+      "source": "photos.brightness",
+      "input": 0.5527,
+      "text_ru": "Светлые фото получают меньше зерна.",
+      "provenance": "measured"
+    },
+    {
+      "param": "texture.blur",
+      "value": 0.6,
+      "rule": "R-TEX-03",
+      "source": "music.tempo_bpm",
+      "input": 68,
+      "text_ru": "Медленный темп песни, введённый вами, делает изображение мягче.",
+      "provenance": "entered"
+    },
+    {
+      "param": "line.trajectory",
+      "value": "falling",
+      "rule": "R-LINE-01",
+      "source": "text.time_of_day",
+      "input": "evening",
+      "text_ru": "Вечер — линия идёт вниз, как день к концу.",
+      "provenance": "measured"
+    },
+    {
+      "param": "line.amplitude",
+      "value": 0.3,
+      "rule": "R-LINE-02",
+      "source": "music.energy",
+      "input": 0.25,
+      "text_ru": "Низкая энергия песни, введённая вами, задаёт небольшой размах линии.",
+      "provenance": "entered"
+    },
+    {
+      "param": "line.roughness",
+      "value": 0.33,
+      "rule": "R-LINE-03",
+      "source": "music.energy",
+      "input": 0.25,
+      "text_ru": "Спокойная музыка даёт гладкую линию.",
+      "provenance": "entered"
+    },
+    {
+      "param": "line.color_index",
+      "value": 0,
+      "rule": "R-LINE-04",
+      "source": "system",
+      "input": null,
+      "text_ru": "Линия всегда берёт первый цвет палитры, чтобы узнаваться в каждом дне.",
+      "provenance": "measured"
+    },
+    {
+      "param": "motion.reveal_ms",
+      "value": 2980,
+      "rule": "R-MOT-01",
+      "source": "music.tempo_bpm",
+      "input": 68,
+      "text_ru": "Медленный темп — длинная проявка.",
+      "provenance": "entered"
+    },
+    {
+      "param": "motion.pulse_ms",
+      "value": 882,
+      "rule": "R-MOT-02",
+      "source": "music.tempo_bpm",
+      "input": 68,
+      "text_ru": "Пульс движения соответствует темпу песни.",
+      "provenance": "entered"
+    },
+    {
+      "param": "contrast",
+      "value": 0.6,
+      "rule": "R-CON-01",
+      "source": "music.mode",
+      "input": "minor",
+      "text_ru": "Минорный лад, введённый вами, добавляет контраст к контрасту фото.",
+      "provenance": "entered"
+    }
   ],
   "profile": {
-    "text": { "time_of_day": "evening", "season": "autumn", "environment": "home", "weather": "rain", "events_count": 1, "length_words": 60, "keywords": ["дождь", "чай", "окно"] },
-    "photos": { "count": 2, "dominant_colors": ["#C98B4F", "#3B3A44", "#E8D2B0"], "brightness": 0.35, "contrast": 0.4, "warmth": 0.7 },
-    "music": { "source": "link", "url": "https://example.com/song-calm", "title": null, "artist": null, "year": 2016, "genre": "ambient", "tempo_bpm": 68, "energy": 0.25, "mode": "minor", "provenance": "entered" }
+    "text": {
+      "time_of_day": "evening",
+      "season": "unknown",
+      "environment": "home",
+      "weather": "rain",
+      "events_count": 2,
+      "length_words": 19,
+      "keywords": [
+        "дождь",
+        "чай",
+        "окна",
+        "звонок",
+        "мамы"
+      ]
+    },
+    "photos": {
+      "count": 2,
+      "dominant_colors": [
+        "#3B3A44",
+        "#C98B4F",
+        "#E8D2B0"
+      ],
+      "brightness": 0.5527,
+      "contrast": 0.4918,
+      "warmth": 0.6105
+    },
+    "music": {
+      "source": "link",
+      "url": "https://example.com/song-calm",
+      "title": null,
+      "artist": null,
+      "year": 2016,
+      "genre": "ambient",
+      "tempo_bpm": 68,
+      "energy": 0.25,
+      "mode": "minor",
+      "provenance": "entered"
+    }
   }
 }

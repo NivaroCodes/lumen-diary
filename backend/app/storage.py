@@ -78,6 +78,12 @@ class Storage:
             conn.commit()
         self._ready = True
 
+    def cleanup_tmp(self) -> None:
+        """Удаляет остатки незавершённых записей (вызывается при старте приложения)."""
+        if self.tmp_dir.is_dir():
+            for entry in self.tmp_dir.iterdir():
+                shutil.rmtree(entry, ignore_errors=True) if entry.is_dir() else entry.unlink(missing_ok=True)
+
     def _connect(self) -> sqlite3.Connection:
         self._ensure()
         conn = sqlite3.connect(self.db_path)

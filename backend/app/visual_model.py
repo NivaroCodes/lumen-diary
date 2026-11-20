@@ -8,6 +8,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+from decimal import ROUND_HALF_UP, Decimal
 from typing import Any, Sequence
 
 SCHEMA_VERSION = "1.0"
@@ -19,8 +20,8 @@ ROUGH_GENRES = {"rock", "electronic"}
 
 
 def _round2(x: float) -> float:
-    """Два знака после запятой обычным round(): так посчитаны фикстуры (0.445 -> 0.44)."""
-    return round(x, 2)
+    """Два знака после запятой, ROUND_HALF_UP (0.445 -> 0.45). Шум float срезаем до 10 знаков."""
+    return float(Decimal(repr(round(x, 10))).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
 
 
 def _round_int(x: float) -> int:
@@ -32,7 +33,7 @@ def _clamp(x: float, lo: float, hi: float) -> float:
 
 
 def compute_seed(text: str, photo_hashes: Sequence[str], music_url: str, music_description: str) -> int:
-    """R-SEED-01: первые 8 байт SHA-256 от канонизированного JSON входов."""
+    """R-SEED-01: первые 4 байта SHA-256 (uint32, big-endian) от канонизированного JSON входов."""
     canonical = json.dumps(
         {
             "text": text,
@@ -44,7 +45,7 @@ def compute_seed(text: str, photo_hashes: Sequence[str], music_url: str, music_d
         sort_keys=True,
         separators=(",", ":"),
     )
-    return int.from_bytes(hashlib.sha256(canonical.encode("utf-8")).digest()[:8], "big")
+    return int.from_bytes(hashlib.sha256(canonical.encode("utf-8")).digest()[:4], "big")
 
 
 def _prov(value: Any, source_provenance: str) -> str:

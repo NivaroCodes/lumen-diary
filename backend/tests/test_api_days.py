@@ -116,14 +116,14 @@ def test_open_day_returns_visual_explain_profile(client, three_days):
 
 
 def test_music_driven_params_match_fixture(three_days):
-    """Часть visual, зависящая только от музыки, совпадает с фикстурой (допуск 0.01)."""
+    """Часть visual, зависящая только от музыки, точно совпадает с фикстурой."""
     for name, d in three_days.items():
         fx = load_fixture(name)["visual"]
         v = d["visual"]
         assert v["motion"] == fx["motion"]
         assert v["texture"]["blur"] == fx["texture"]["blur"]
-        assert v["line"]["amplitude"] == pytest.approx(fx["line"]["amplitude"], abs=0.0101)
-        assert v["line"]["roughness"] == pytest.approx(fx["line"]["roughness"], abs=0.0101)
+        assert v["line"]["amplitude"] == fx["line"]["amplitude"]
+        assert v["line"]["roughness"] == fx["line"]["roughness"]
         assert v["line"]["color_index"] == 0
 
 

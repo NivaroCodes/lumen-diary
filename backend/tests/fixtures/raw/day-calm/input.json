@@ -1,0 +1,14 @@
+{
+  "id": "day-calm-001",
+  "date": "2026-11-14",
+  "text": "Вечером шёл дождь. Заварила чай, села у окна и просто читала. Один звонок от мамы, и тихо до ночи.",
+  "music": {
+    "url": "https://example.com/song-calm",
+    "description": "медленная инструментальная композиция, ambient",
+    "year": 2016,
+    "genre": "ambient",
+    "tempo_bpm": 68,
+    "energy": 0.25,
+    "mode": "minor"
+  }
+}

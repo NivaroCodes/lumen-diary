@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
@@ -19,9 +20,16 @@ logger = logging.getLogger("lumen")
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or load_settings()
-    app = FastAPI(title="Lumen Diary API", version="0.1.0")
+    storage = Storage(settings.data_dir)  # папки и БД создаются при первом обращении
+
+    @asynccontextmanager
+    async def lifespan(_: FastAPI):
+        storage.cleanup_tmp()
+        yield
+
+    app = FastAPI(title="Lumen Diary API", version="0.1.0", lifespan=lifespan)
     app.state.settings = settings
-    app.state.storage = Storage(settings.data_dir)  # папки и БД создаются при первом обращении
+    app.state.storage = storage
 
     app.add_middleware(
         CORSMiddleware,

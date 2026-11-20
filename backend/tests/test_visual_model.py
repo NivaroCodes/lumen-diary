@@ -8,7 +8,6 @@ import pytest
 from app.visual_model import build_visual, compute_seed
 from conftest import FIXTURE_NAMES, load_fixture
 
-TOL = 0.01 + 1e-9  # допуск 0.01 из mapping.md; запас на шум float
 
 
 def assert_close(actual, expected, path=""):
@@ -16,8 +15,6 @@ def assert_close(actual, expected, path=""):
         assert set(actual) == set(expected), path
         for k in expected:
             assert_close(actual[k], expected[k], f"{path}.{k}")
-    elif isinstance(expected, float) or isinstance(actual, float):
-        assert actual == pytest.approx(expected, abs=TOL), path
     else:
         assert actual == expected, path
 
@@ -76,7 +73,7 @@ def test_seed_deterministic_and_input_sensitive():
     assert base != compute_seed("текст", ["h2", "h1"], "https://a.b", "описание")
     assert base != compute_seed("текст", ["h1", "h2"], "https://a.c", "описание")
     assert base != compute_seed("текст", ["h1", "h2"], "https://a.b", "иное")
-    assert 0 <= base < 2**64
+    assert 0 <= base <= 2**32 - 1
 
 
 def _profile_variant(**changes):

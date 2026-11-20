@@ -34,7 +34,7 @@ uvicorn app.main:app --reload
 | GET | `/api/days/{id}` | `{id, title, date, text, photos[], music, visual, explain, profile}` |
 | GET | `/media/{id}/photo-N.jpg` | Очищенное фото дня (JPEG без EXIF) |
 
-Поля `POST /api/days` (multipart): `text` (1–5000), `photos` или `photos[]` (1–`MAX_PHOTOS` файлов JPEG/PNG/WebP, формат проверяется по содержимому), `music_url` (http/https, до 500), `music_description` (1–300); необязательные: `music_title`, `music_artist` (до 200), `music_year` (1900…текущий), `music_genre` (до 40, приводится к нижнему регистру), `music_tempo_bpm` (40…220), `music_energy` (0…1), `music_mode` (`major`/`minor`/`unknown`), `date` (`YYYY-MM-DD`, по умолчанию сегодня).
+Поля `POST /api/days` (multipart): `text` (1–5000), `photos` или `photos[]` (1–`MAX_PHOTOS` файлов JPEG/PNG/WebP, формат проверяется по содержимому), `music_url` (http/https, до 500), `music_description` (1–300); необязательные: `music_title`, `music_artist` (до 200), `music_year` (1900…текущий), `music_genre` (ambient, pop, rock, electronic, jazz, classical, hip-hop, folk, other, unknown; регистр не важен), `music_tempo_bpm` (40…220), `music_energy` (0…1), `music_mode` (`major`/`minor`/`unknown`), `date` (`YYYY-MM-DD`, по умолчанию сегодня).
 
 Ошибки: `400 {"error": "validation_error", "field": "...", "message": "..."}`, `413 {"error": "file_too_large", ...}`, `404 {"error": "not_found"}`, `500 {"error": "internal_error"}`. Трассировок в ответах нет.
 
@@ -62,27 +62,25 @@ cd backend
 python -m pytest -q
 ```
 
-Тесты пишут только во временные папки (`tmp_path`), фото генерируются синтетически. В `tests/fixtures/` лежат `day-*.json` (только чтение).
+Фикстуры пересобираются: `python scripts/regenerate_fixtures.py` (из `backend/`); тест `test_fixtures_fresh.py` проверяет, что файлы свежие. Тесты пишут только во временные папки (`tmp_path`), фото генерируются синтетически. В `tests/fixtures/` лежат `day-*.json` (генерируются из `tests/fixtures/raw/`).
 
 ## Расхождения с контрактом
 
 Контракт (`docs/api-contract.md`, `docs/mapping.md`) не менялся. Найденное:
 
-1. **Нет `visual_model.py` и `test_visual_model.py`.** В архиве `lumen-diary-handoff-team02.zip` только `docs/` и `fixtures/`, этих двух файлов там нет (в репозитории тоже). `app/visual_model.py` написан заново по `mapping.md`, `tests/test_visual_model.py` — новый, это не те «15 тестов» из задания. Если оригиналы существуют, их стоит сверить.
-2. **`seed` по R-SEED-01 — 64-бит.** Первые 8 байт SHA-256 дают число до 2⁶⁴. JavaScript теряет точность выше 2⁵³, поэтому `JSON.parse` на фронтенде может исказить seed. Нужно решение: взять 6 байт или отдавать строкой. Пока по контракту, 8 байт.
-3. **Фикстуры округлены непоследовательно:** `0.2 + 0.7 × 0.35 = 0.445` записано как `0.44` (day-calm), `0.2 + 0.7 × 0.85 = 0.795` — как `0.8` (day-energy). Код использует обычный `round(x, 2)`, тесты сравнивают с допуском 0.01, как в `mapping.md`.
-4. **Тексты фикстур не соответствуют их `profile.text`:** в `profile` указано 60/150/280 слов, в самих текстах 19–21. Фикстуры проверяются на уровне «`profile` → `visual`». На уровне API (текст → профиль) плотность получается другой, это ожидаемо.
+1. **Нет `visual_model.py` и `test_visual_model.py` в архиве** (только `docs/` и `fixtures/`). Реализация написана по `mapping.md`, оригинала для сверки нет; единственная реализация — `app/visual_model.py`.
+2. ~~seed 64-бит~~ Решено: seed — uint32 (4 байта SHA-256), `docs/` обновлены.
+3. ~~Округление фикстур~~ Решено: Decimal ROUND_HALF_UP, фикстуры генерируются `scripts/regenerate_fixtures.py` из `tests/fixtures/raw/`, сравнение точное.
 5. **`warmth`:** контракт — «отношение красного к синему в доминирующих цветах», задание — `0.5 + (mean R − mean B) / 510` по всем пикселям. Реализована формула из задания.
 6. **Форма `music` в ответе не описана в контракте.** Отдаём объединение формы фикстур (`type`, `description`, `url`, `provenance`) и `DayProfile.music` (`source`, `title`, `artist`, `year`, `genre`, `tempo_bpm`, `energy`, `mode`).
 7. **Поля `music_description`, `music_mode`, `date` отсутствуют в таблице контракта (раздел 6).** Добавлены по заданию; `date` необязательное, нужно, чтобы дни из фикстур получили свои даты. Контракт перечисляет `music_file`, он не реализован (не в MVP).
 8. **Фото отдаются своим маршрутом, а не `StaticFiles`.** URL по заданию `/media/<id>/<file>`, а папка называется `<date>_<id8>`, `StaticFiles` не сопоставит одно с другим. Маршрут принимает только `photo-N.jpg` (защита от выхода из папки). Файлы лежат в `photos/`, а URL без этого сегмента, как в фикстурах.
 9. **Палитра:** при менее чем трёх найденных цветах (например, однотонное фото) контракт требует 3–5 цветов. `build_visual` дополняет нейтральной палитрой по умолчанию и пишет об этом в `explain`.
-10. **R-LINE-03:** бонус `+0.1` срабатывает только на точное `rock` или `electronic` (нижний регистр). Русские названия («рок», «электроника») бонус не получают, правило не менял.
+10. **R-LINE-03:** жанр теперь из закрытого списка, бонус `+0.1` — для `rock` и `electronic`.
 11. **Погода:** если слов о погоде нет, `weather = "none"` (а не `unknown`), для R-TEX-01 разницы нет.
 12. **`CORS_ORIGIN` по умолчанию:** `.env.example` в репозитории нет, значение по умолчанию `http://localhost:5173` выбрано как адрес Vite.
 
 ## Известные ограничения
 
 - Размер файла проверяется после того, как Starlette принял multipart-тело (на диск во временный файл): ранней отсечки по `Content-Length` нет.
-- Остатки `DATA_DIR/tmp/` после аварийного завершения процесса при старте не чистятся.
 - Анализ текста — небольшие словари и основы слов, точность намеренно невысокая (воспроизводимость важнее).

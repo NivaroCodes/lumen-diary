@@ -137,7 +137,7 @@ def test_year_bounds_ok(client):
 @pytest.mark.parametrize("field,value", [
     ("music_tempo_bpm", "39"), ("music_tempo_bpm", "221"), ("music_tempo_bpm", "fast"),
     ("music_tempo_bpm", "nan"), ("music_energy", "1.1"), ("music_energy", "-0.1"),
-    ("music_energy", "high"), ("music_mode", "dorian"), ("music_genre", "x" * 41),
+    ("music_energy", "high"), ("music_mode", "dorian"), ("music_genre", "x" * 41), ("music_genre", "dubstep"),
     ("music_title", "x" * 201), ("music_artist", "x" * 201), ("date", "2026-13-40"), ("date", "14.11.2026"),
 ])
 def test_other_field_errors(client, field, value):

@@ -32,3 +32,13 @@ def test_app_does_not_touch_disk_until_used(tmp_path):
     data = tmp_path / "never-created"
     create_app(Settings(data_dir=data))
     assert not data.exists()
+
+
+def test_startup_removes_tmp_leftovers(settings):
+    leftover = settings.data_dir / "tmp" / "dead-id" / "photos"
+    leftover.mkdir(parents=True)
+    (leftover / "photo-1.jpg").write_bytes(b"x")
+    (settings.data_dir / "tmp" / "stray.txt").write_text("x")
+    with TestClient(create_app(settings)) as client:
+        assert client.get("/health").status_code == 200
+    assert list((settings.data_dir / "tmp").iterdir()) == []
