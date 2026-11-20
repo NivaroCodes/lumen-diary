@@ -1,8 +1,8 @@
 {
   "id": "day-calm-001",
-  "title": "Вечер, чай и дождь",
+  "title": "Вечер, комнате и дождь",
   "date": "2026-11-14",
-  "text": "Вечером шёл дождь. Заварила чай, села у окна и просто читала. Один звонок от мамы, и тихо до ночи.",
+  "text": "Вечером за окном тихо шёл дождь, и в комнате было совсем спокойно. Я заварила чай, укрыла плечи тёплым пледом и долго смотрела на мокрые крыши напротив. Лампа горела мягко, на столе лежала открытая книга, а в чашке медленно остывал травяной настой. Никуда не хотелось спешить, мысли текли ровно и неторопливо, и этот тихий час казался самым уютным за всю неделю.",
   "photos": [
     "/media/day-calm-001/photo-1.jpg",
     "/media/day-calm-001/photo-2.jpg"
@@ -15,7 +15,7 @@
   },
   "visual": {
     "schema_version": "1.0",
-    "seed": 637036001,
+    "seed": 3191148437,
     "light": {
       "direction_deg": 270,
       "intensity": 0.59,
@@ -30,8 +30,8 @@
       "saturation": 0.5
     },
     "density": {
-      "value": 0.26,
-      "elements": 5
+      "value": 0.4,
+      "elements": 6
     },
     "texture": {
       "grain": 0.22,
@@ -49,7 +49,7 @@
       "pulse_ms": 882
     },
     "contrast": 0.6,
-    "caption": "Вечер, чай и дождь"
+    "caption": "Вечер, комнате и дождь"
   },
   "explain": [
     {
@@ -107,19 +107,19 @@
     },
     {
       "param": "density.value",
-      "value": 0.26,
+      "value": 0.4,
       "rule": "R-DEN-01",
       "source": "text.events_count",
       "input": 2,
-      "text_ru": "В тексте событий: 2, слов: 19. Немного событий — композиция разреженная.",
+      "text_ru": "В тексте событий: 2, слов: 60. Событий умеренно — плотность средняя.",
       "provenance": "measured"
     },
     {
       "param": "density.elements",
-      "value": 5,
+      "value": 6,
       "rule": "R-DEN-02",
       "source": "density.value",
-      "input": 0.26,
+      "input": 0.4,
       "text_ru": "Мало элементов — больше пустого пространства.",
       "provenance": "measured"
     },
@@ -218,16 +218,16 @@
     "text": {
       "time_of_day": "evening",
       "season": "unknown",
-      "environment": "home",
+      "environment": "nature",
       "weather": "rain",
       "events_count": 2,
-      "length_words": 19,
+      "length_words": 60,
       "keywords": [
         "дождь",
+        "комнате",
         "чай",
-        "окна",
-        "звонок",
-        "мамы"
+        "травяной",
+        "окном"
       ]
     },
     "photos": {
