@@ -24,3 +24,5 @@
 | R-SEED-01 | все входы | `seed` | первые 4 байта SHA-256 (uint32, big-endian) от канонизированного JSON входов |
 
 Примечание к фикстурам: дробные значения округляются до двух знаков (Decimal, ROUND_HALF_UP). Фикстуры генерируются `backend/scripts/regenerate_fixtures.py`, сравнение в тестах точное.
+
+Константы в коде (`backend/app/visual_model.py`): R-LIGHT-01 — `DIRECTION`, R-LINE-01 — `TRAJECTORY`. Фикстуры: `backend/tests/fixtures/`.
