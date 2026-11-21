@@ -4,6 +4,6 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig(() => {
   const apiTarget = process.env.LUMEN_API_TARGET || 'http://127.0.0.1:8000'
-  const proxy = { '/api': apiTarget }
+  const proxy = { '/api': apiTarget, '/media': apiTarget }
   return { plugins: [react(), tailwindcss()], server: { proxy }, preview: { proxy } }
 })
