@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from app.text_analysis import FALLBACK_TITLE, analyze_text, make_title
+from app.text_analysis import FALLBACK_TITLE, _titleable, analyze_text, make_title
 
 
 @pytest.mark.parametrize("text,expected", [
@@ -115,3 +115,22 @@ def test_title_fallback_when_too_long():
     profile = {"time_of_day": "evening", "weather": "rain", "season": "autumn",
                "keywords": ["один два три четыре пять шесть семь"]}
     assert make_title(profile) == FALLBACK_TITLE
+
+
+def test_title_skips_adjectives_and_verbs():
+    # Регрессия: раньше попадали «ясной», «деталей», «отсидел».
+    assert make_title(analyze_text("Просто день без деталей.")) != "День и деталей"
+    assert "ясной" not in make_title(analyze_text("Погода была ясной."))
+    assert "отсидел" not in make_title(analyze_text("Отсидел 7 уроков. Вечером домашка."))
+    assert "деталей" not in make_title(analyze_text("День без деталей, вечером шёл дождь."))
+
+
+@pytest.mark.parametrize("word", ["школа", "пчела", "стол", "зал", "школе"])
+def test_title_keeps_nouns_ending_in_l_or_la(word):
+    # Регрессия: суффикс «-л/-ла» из regex по прошедшему времени отсекал существительные.
+    assert _titleable(word, set()) is True
+
+
+def test_title_keeps_school_keyword_in_title():
+    title = make_title({"time_of_day": "evening", "keywords": ["школе", "чай"], "weather": "rain"})
+    assert "школе" in title
