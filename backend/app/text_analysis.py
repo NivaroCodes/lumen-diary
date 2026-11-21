@@ -82,6 +82,16 @@ NEUTRAL_WORDS: dict[str, tuple[str, ...]] = {
     "unknown": ("тишина", "день"),
 }
 
+# Слова, которые нельзя ставить в название: прилагательные в косвенных падежах,
+# служебные и общие слова. Название «Вечер, ясной и солнце» появилось из-за них.
+TITLE_BLOCKLIST = frozenset({
+    "ясной", "ясная", "ясный", "ясно", "ясного", "ясную", "ясным", "ясные", "ясных",
+    "деталей", "детали", "детал", "дела", "дело", "погода", "погоды", "погоде",
+    "день", "дня", "дню", "днём", "вечера", "вечером", "утра", "утром", "ночи", "ночью",
+    "было", "была", "были", "стало", "очень", "просто", "потом", "вместе", "сегодня",
+    "раз", "раза", "время", "времени",
+})
+
 TIME_TITLE = {"morning": "Утро", "day": "День", "evening": "Вечер", "night": "Ночь"}
 WEATHER_TITLE = {"rain": "дождь", "fog": "туман", "snow": "снег", "sun": "солнце"}
 ENV_TITLE = {"nature": "природа", "city": "город", "home": "дом", "mixed": "прогулка"}
@@ -199,11 +209,19 @@ def make_title(profile: dict[str, Any]) -> str:
     return FALLBACK_TITLE
 
 
+_PAST_TENSE_RE = re.compile(r"(л|ла|ли|ло|лась|лись)$")
+
+
+def _titleable(word: str, taken: set[str]) -> bool:
+    """Слово годится в название: не занято, не в блок-листе и не глагол в прошедшем времени."""
+    return word not in taken and word not in TITLE_BLOCKLIST and not _PAST_TENSE_RE.search(word)
+
+
 def _build_title(profile: dict[str, Any]) -> str:
     time_word = TIME_TITLE.get(profile.get("time_of_day", "unknown"))
     tail = WEATHER_TITLE.get(profile.get("weather")) or ENV_TITLE.get(profile.get("environment"))
     taken = {w.lower() for w in (time_word, tail) if w}
-    keyword = next((k for k in profile.get("keywords") or [] if k not in taken), None)
+    keyword = next((k for k in profile.get("keywords") or [] if _titleable(k, taken)), None)
 
     if time_word and keyword and tail:
         words = [time_word + ",", keyword, "и", tail]  # «Вечер, чай и дождь»

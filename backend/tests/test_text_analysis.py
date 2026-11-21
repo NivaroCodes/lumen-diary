@@ -115,3 +115,11 @@ def test_title_fallback_when_too_long():
     profile = {"time_of_day": "evening", "weather": "rain", "season": "autumn",
                "keywords": ["один два три четыре пять шесть семь"]}
     assert make_title(profile) == FALLBACK_TITLE
+
+
+def test_title_skips_adjectives_and_verbs():
+    # Регрессия: раньше попадали «ясной», «деталей», «отсидел».
+    assert make_title(analyze_text("Просто день без деталей.")) != "День и деталей"
+    assert "ясной" not in make_title(analyze_text("Погода была ясной."))
+    assert "отсидел" not in make_title(analyze_text("Отсидел 7 уроков. Вечером домашка."))
+    assert "деталей" not in make_title(analyze_text("День без деталей, вечером шёл дождь."))
