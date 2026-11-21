@@ -15,6 +15,20 @@ uvicorn app.main:app --reload
 
 Сервер слушает `http://127.0.0.1:8000`. При первом запросе создаются `DATA_DIR/lumen.sqlite3`, `DATA_DIR/days/` и `DATA_DIR/tmp/`.
 
+## Запуск одним портом
+
+FastAPI может отдавать и API, и собранный фронтенд с одного порта. Сначала соберите фронтенд (из корня репозитория):
+
+```bash
+cd frontend
+npm ci
+npm run build          # появится frontend/dist/
+cd ../backend
+uvicorn app.main:app --port 8000
+```
+
+Откройте `http://localhost:8000`. Фронтенд раздаётся из `frontend/dist`; путь вычисляется относительно `backend/app`, поэтому команду можно запускать из любой папки. Неизвестные пути вне `/api`, `/media`, `/health`, `/docs` и `/openapi.json` (например, `/archive`, `/memory/<id>`) возвращают `index.html`. Если `frontend/dist` не собран, API работает как обычно, а `/` отвечает JSON с подсказкой собрать фронтенд.
+
 ## Переменные окружения
 
 | Переменная | По умолчанию | Назначение |

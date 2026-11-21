@@ -117,7 +117,21 @@ def get_day(day_id: str, request: Request) -> dict:
     return day
 
 
-@media_router.get("/media/{day_id}/{filename}", summary="Фото дня", include_in_schema=True)
+@media_router.get(
+    "/media/{day_id}/{filename}",
+    summary="Фото дня",
+    response_class=FileResponse,
+    responses={
+        200: {
+            "description": "Очищенное фото дня (JPEG без EXIF)",
+            "content": {"image/jpeg": {"schema": {"type": "string", "format": "binary"}}},
+        },
+        404: {
+            "description": "Фото не найдено",
+            "content": {"application/json": {"example": {"error": "not_found"}}},
+        },
+    },
+)
 def get_media(day_id: str, filename: str, request: Request) -> FileResponse:
     path = _storage(request).photo_path(day_id, filename)
     if path is None:
