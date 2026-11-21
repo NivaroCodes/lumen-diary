@@ -1,0 +1,224 @@
+{
+  "day": "day-dense",
+  "source": "tests/fixtures/raw/day-dense/input.json (вход, как в POST /api/days при чистом запуске)",
+  "input": {
+    "date": "2026-11-16",
+    "text": "День начался с совещания, которое затянулось почти на два часа. Потом я написала отчёт, отправила его руководителю и сразу позвонила клиенту. Пока ждала ответа, разобрала почту и отменила две лишние встречи. К обеду на улице стал густой туман, и из окна офиса не было видно соседних домов. Я сходила в столовую, быстро съела суп и вернулась к столу. После обеда проверила договор, исправила цифры в таблице и согласовала сроки с коллегами. Затем мы обсудили новый проект, распределили задачи и составили график на месяц. Позже я поехала на склад, забрала документы и отвезла их в другой район. В пробке на выезде простояла почти час, слушая новости и перебирая в голове список дел. Вернувшись, ответила на десяток писем, подписала акты и передала их в бухгалтерию. Туман так и не рассеялся, а я ещё долго собирала бумаги, закрывала заявки и готовила материалы на завтра, чтобы ничего не потерялось в этой бесконечной суете. Потом я встретила коллегу и решила поговорить с ним о сроках, а он принёс свежие данные. Я начала проверять последние файлы, закончила правки и собрала всё в одну папку. Усталость была ровной, серой и почти привычной, как сам этот длинный рабочий день, полный звонков, цифр, бумаг и коротких разговоров в коридоре.",
+    "photos": [
+      "photo-1.png",
+      "photo-2.png"
+    ],
+    "music": {
+      "url": "https://example.com/song-dense",
+      "description": "поп-композиция среднего темпа",
+      "year": 2021,
+      "genre": "pop",
+      "tempo_bpm": 100,
+      "energy": 0.55,
+      "mode": "unknown"
+    }
+  },
+  "title": "День, совещания и туман",
+  "folder": "2026-11-16_aea8ea96",
+  "visual": {
+    "schema_version": "1.0",
+    "seed": 2290553873,
+    "light": {
+      "direction_deg": 180,
+      "intensity": 0.5,
+      "temperature_k": 4672
+    },
+    "palette": {
+      "colors": [
+        "#2B2E33",
+        "#6B6F76",
+        "#A3A7AD"
+      ],
+      "saturation": 0.45
+    },
+    "density": {
+      "value": 1.0,
+      "elements": 12
+    },
+    "texture": {
+      "grain": 0.29,
+      "blur": 0.3,
+      "weather": "fog"
+    },
+    "line": {
+      "trajectory": "wave",
+      "amplitude": 0.54,
+      "roughness": 0.48,
+      "color_index": 0
+    },
+    "motion": {
+      "reveal_ms": 2500,
+      "pulse_ms": 600
+    },
+    "contrast": 0.45,
+    "caption": "День, совещания и туман"
+  },
+  "explain": [
+    {
+      "param": "light.direction_deg",
+      "value": 180,
+      "rule": "R-LIGHT-01",
+      "source": "text.time_of_day",
+      "input": "day",
+      "text_ru": "День в тексте — свет идёт с нижней стороны открытки, а ночь — с верхней. Направление задано правилом времени суток, а не положением реального солнца.",
+      "provenance": "measured"
+    },
+    {
+      "param": "light.intensity",
+      "value": 0.5,
+      "rule": "R-LIGHT-02",
+      "source": "photos.brightness",
+      "input": 0.4219,
+      "text_ru": "Средняя яркость фото даёт ровный свет.",
+      "provenance": "measured"
+    },
+    {
+      "param": "light.temperature_k",
+      "value": 4672,
+      "rule": "R-LIGHT-03",
+      "source": "photos.warmth",
+      "input": 0.481,
+      "text_ru": "Нейтральные цвета фото дают нейтральную температуру света.",
+      "provenance": "measured"
+    },
+    {
+      "param": "palette.colors",
+      "value": [
+        "#2B2E33",
+        "#6B6F76",
+        "#A3A7AD"
+      ],
+      "rule": "R-PAL-01",
+      "source": "photos.dominant_colors",
+      "input": [
+        "#2B2E33",
+        "#6B6F76",
+        "#A3A7AD"
+      ],
+      "text_ru": "Цвета взяты из доминирующих цветов фото.",
+      "provenance": "measured"
+    },
+    {
+      "param": "palette.saturation",
+      "value": 0.45,
+      "rule": "R-PAL-02",
+      "source": "photos.contrast",
+      "input": 0.3857,
+      "text_ru": "Умеренный контраст фото даёт сдержанную насыщенность.",
+      "provenance": "measured"
+    },
+    {
+      "param": "density.value",
+      "value": 1.0,
+      "rule": "R-DEN-01",
+      "source": "text.events_count",
+      "input": 8,
+      "text_ru": "В тексте событий: 8, слов: 200. Много событий — композиция плотная.",
+      "provenance": "measured"
+    },
+    {
+      "param": "density.elements",
+      "value": 12,
+      "rule": "R-DEN-02",
+      "source": "density.value",
+      "input": 1.0,
+      "text_ru": "Много элементов — композиция насыщена.",
+      "provenance": "measured"
+    },
+    {
+      "param": "texture.weather",
+      "value": "fog",
+      "rule": "R-TEX-01",
+      "source": "text.weather",
+      "input": "fog",
+      "text_ru": "Туман в тексте добавляет дымку.",
+      "provenance": "measured"
+    },
+    {
+      "param": "texture.grain",
+      "value": 0.29,
+      "rule": "R-TEX-02",
+      "source": "photos.brightness",
+      "input": 0.4219,
+      "text_ru": "Тёмные фото получают больше зерна.",
+      "provenance": "measured"
+    },
+    {
+      "param": "texture.blur",
+      "value": 0.3,
+      "rule": "R-TEX-03",
+      "source": "music.tempo_bpm",
+      "input": 100,
+      "text_ru": "Средний темп песни, введённый вами, даёт умеренную мягкость.",
+      "provenance": "entered"
+    },
+    {
+      "param": "line.trajectory",
+      "value": "wave",
+      "rule": "R-LINE-01",
+      "source": "text.time_of_day",
+      "input": "day",
+      "text_ru": "День или время суток не определено — линия волнистая.",
+      "provenance": "measured"
+    },
+    {
+      "param": "line.amplitude",
+      "value": 0.54,
+      "rule": "R-LINE-02",
+      "source": "music.energy",
+      "input": 0.55,
+      "text_ru": "Средняя энергия песни, введённая вами, задаёт средний размах линии.",
+      "provenance": "entered"
+    },
+    {
+      "param": "line.roughness",
+      "value": 0.48,
+      "rule": "R-LINE-03",
+      "source": "music.energy",
+      "input": 0.55,
+      "text_ru": "Энергия песни, введённая вами, добавляет линии шероховатость.",
+      "provenance": "entered"
+    },
+    {
+      "param": "line.color_index",
+      "value": 0,
+      "rule": "R-LINE-04",
+      "source": "system",
+      "input": null,
+      "text_ru": "Линия всегда берёт первый цвет палитры, чтобы узнаваться в каждом дне.",
+      "provenance": "measured"
+    },
+    {
+      "param": "motion.reveal_ms",
+      "value": 2500,
+      "rule": "R-MOT-01",
+      "source": "music.tempo_bpm",
+      "input": 100,
+      "text_ru": "Средний темп — проявка средней длины.",
+      "provenance": "entered"
+    },
+    {
+      "param": "motion.pulse_ms",
+      "value": 600,
+      "rule": "R-MOT-02",
+      "source": "music.tempo_bpm",
+      "input": 100,
+      "text_ru": "Пульс движения соответствует темпу песни.",
+      "provenance": "entered"
+    },
+    {
+      "param": "contrast",
+      "value": 0.45,
+      "rule": "R-CON-01",
+      "source": "music.mode",
+      "input": "unknown",
+      "text_ru": "Лад не указан, контраст задаёт только фото.",
+      "provenance": "measured"
+    }
+  ]
+}
