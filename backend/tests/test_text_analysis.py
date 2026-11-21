@@ -1,8 +1,16 @@
 from __future__ import annotations
 
+import json
+import re
+from pathlib import Path
+
 import pytest
 
-from app.text_analysis import FALLBACK_TITLE, _titleable, analyze_text, make_title
+from app.text_analysis import FALLBACK_TITLE, TITLE_BLOCKLIST, _titleable, analyze_text, make_title
+
+STRESS_PATH = Path(__file__).parent / "data" / "title_stress.json"
+STRESS_TEXTS = json.loads(STRESS_PATH.read_text(encoding="utf-8"))
+TIME_WORDS = {"утро", "день", "вечер", "ночь"}
 
 
 @pytest.mark.parametrize("text,expected", [
@@ -134,3 +142,22 @@ def test_title_keeps_nouns_ending_in_l_or_la(word):
 def test_title_keeps_school_keyword_in_title():
     title = make_title({"time_of_day": "evening", "keywords": ["школе", "чай"], "weather": "rain"})
     assert "школе" in title
+
+
+@pytest.mark.parametrize("item", STRESS_TEXTS, ids=[t["id"] for t in STRESS_TEXTS])
+def test_stress_title_is_sane(item):
+    title = make_title(analyze_text(item["text"]))
+    assert title.strip()
+    assert 3 <= len(title.split()) <= 7, (item["id"], title)
+    assert re.search(r"[a-zA-Z]", title) is None, (item["id"], title)
+    # Слова времени суток — часть шаблона («День», «Вечер»), а не ключевые слова из текста.
+    words = set(re.findall(r"[а-яё]+", title.lower())) - TIME_WORDS
+    assert not (words & TITLE_BLOCKLIST), (item["id"], title)
+
+
+def test_defensive_mode_uses_neutral_title_not_random_word():
+    # Без двух уверенных признаков — не свободное слово, а нейтральное название по времени суток.
+    assert make_title(analyze_text("Ничего не делал.")) == FALLBACK_TITLE
+    assert make_title(analyze_text("Утром ничего не делал.")) == "Утро в записи"
+    assert make_title(analyze_text("Просто день без деталей.")) == "День в записи"
+    assert make_title(analyze_text("Вечер в школе, потом гулял.")) == "Вечер в записи"
