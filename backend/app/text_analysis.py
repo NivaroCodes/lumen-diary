@@ -90,6 +90,7 @@ TITLE_BLOCKLIST = frozenset({
     "день", "дня", "дню", "днём", "вечера", "вечером", "утра", "утром", "ночи", "ночью",
     "было", "была", "были", "стало", "очень", "просто", "потом", "вместе", "сегодня",
     "раз", "раза", "время", "времени",
+    "отсидел", "отсидела", "отсидели",
 })
 
 TIME_TITLE = {"morning": "Утро", "day": "День", "evening": "Вечер", "night": "Ночь"}
@@ -209,12 +210,9 @@ def make_title(profile: dict[str, Any]) -> str:
     return FALLBACK_TITLE
 
 
-_PAST_TENSE_RE = re.compile(r"(л|ла|ли|ло|лась|лись)$")
-
-
 def _titleable(word: str, taken: set[str]) -> bool:
-    """Слово годится в название: не занято, не в блок-листе и не глагол в прошедшем времени."""
-    return word not in taken and word not in TITLE_BLOCKLIST and not _PAST_TENSE_RE.search(word)
+    """Слово годится в название: не занято и не в блок-листе."""
+    return word not in taken and word not in TITLE_BLOCKLIST
 
 
 def _build_title(profile: dict[str, Any]) -> str:
