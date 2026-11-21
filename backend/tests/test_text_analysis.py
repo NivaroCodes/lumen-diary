@@ -161,3 +161,15 @@ def test_defensive_mode_uses_neutral_title_not_random_word():
     assert make_title(analyze_text("Утром ничего не делал.")) == "Утро в записи"
     assert make_title(analyze_text("Просто день без деталей.")) == "День в записи"
     assert make_title(analyze_text("Вечер в школе, потом гулял.")) == "Вечер в записи"
+
+
+def test_overcast_weather_is_detected():
+    # Регрессия: «пасмурной» не распознавалось, погода была none.
+    p = analyze_text(
+        "Погода была пасмурной. Отсидел 6 уроков, сидел в ТЦ, обедал бутербродом. "
+        "Потом ближе к 12 дня нам скинули кейс от Genesis хакатона."
+    )
+    assert p["weather"] == "cloud"
+    title = make_title(p)
+    assert title != FALLBACK_TITLE
+    assert "облака" in title
