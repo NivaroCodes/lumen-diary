@@ -24,6 +24,8 @@ uvicorn app.main:app --reload
 | `MAX_UPLOAD_MB` | `10` | Максимальный размер одного фото |
 | `MAX_PHOTOS` | `5` | Максимум фото в одном дне |
 
+Образец со всеми переменными — `.env.example` в корне репозитория. Сервер **не читает файл `.env`**: переменные нужно выставить в окружении до запуска, например в PowerShell `$env:DATA_DIR = "D:\lumen-data"`, в bash `export DATA_DIR=./data`. Если переменная не задана, берётся значение по умолчанию из таблицы.
+
 ## Эндпоинты
 
 | Метод | Путь | Ответ |
@@ -34,9 +36,37 @@ uvicorn app.main:app --reload
 | GET | `/api/days/{id}` | `{id, title, date, text, photos[], music, visual, explain, profile}` |
 | GET | `/media/{id}/photo-N.jpg` | Очищенное фото дня (JPEG без EXIF) |
 
-Поля `POST /api/days` (multipart): `text` (1–5000), `photos` или `photos[]` (1–`MAX_PHOTOS` файлов JPEG/PNG/WebP, формат проверяется по содержимому), `music_url` (http/https, до 500), `music_description` (1–300); необязательные: `music_title`, `music_artist` (до 200), `music_year` (1900…текущий), `music_genre` (ambient, pop, rock, electronic, jazz, classical, hip-hop, folk, other, unknown; регистр не важен), `music_tempo_bpm` (40…220), `music_energy` (0…1), `music_mode` (`major`/`minor`/`unknown`), `date` (`YYYY-MM-DD`, по умолчанию сегодня).
+Поля `POST /api/days` (multipart). Обязательные: `text` (1–5000), `photos` или `photos[]` (1–`MAX_PHOTOS` файлов JPEG/PNG/WebP, формат проверяется по содержимому), `music_url` (http/https, до 500), `music_description` (1–300). Файл песни не принимается (`music_file` в MVP нет). Необязательные: `music_title`, `music_artist` (до 200), `music_year` (1900…текущий), `music_genre` (ambient, pop, rock, electronic, jazz, classical, hip-hop, folk, other, unknown; регистр не важен), `music_tempo_bpm` (40…220), `music_energy` (0…1), `music_mode` (`major`/`minor`/`unknown`), `date` (`YYYY-MM-DD`, по умолчанию сегодня).
 
-Ошибки: `400 {"error": "validation_error", "field": "...", "message": "..."}`, `413 {"error": "file_too_large", ...}`, `404 {"error": "not_found"}`, `500 {"error": "internal_error"}`. Трассировок в ответах нет.
+Ошибки: `400 {"error": "validation_error", "field": "...", "message": "..."}`, `413 {"error": "file_too_large", ...}`, `404 {"error": "not_found"}`, `500 {"error": "internal_error"}`. Трассировок в ответах нет. Все ошибки проверки входов имеют код `validation_error`; поле `field` указывает, какой вход неверен.
+
+## Пример POST /api/days
+
+Пример на Python (httpx уже есть в `requirements-dev.txt`). Для кириллицы в тексте используйте Python, а не `curl` в Git Bash: там аргументы передаются в другой кодировке и текст теряется.
+
+```python
+import httpx
+
+with open("photo.jpg", "rb") as f:
+    files = [("photos", ("photo.jpg", f.read(), "image/jpeg"))]
+
+data = {
+    "text": "Утром был в парке, пил кофе и читал книгу. Вечером шёл дождь.",
+    "music_url": "https://example.com/track",
+    "music_description": "Спокойная песня без слов",
+    "music_genre": "ambient",
+    "music_energy": "0.3",
+    "date": "2026-11-21",  # необязательно, по умолчанию сегодня
+}
+r = httpx.post("http://127.0.0.1:8000/api/days", data=data, files=files, timeout=60)
+print(r.status_code, r.json()["title"])  # 201 и название дня
+```
+
+Поля `music_genre`, `music_energy`, `music_tempo_bpm`, `music_mode`, `music_title`, `music_artist`, `music_year` необязательны. Для фото можно передать несколько файлов: повторите пару `("photos", ...)` в списке `files`.
+
+## Список инструментов
+
+Зависимости Python и фронтенда, а также внешние сервисы (которых нет) описаны в [`docs/tools.md`](../docs/tools.md).
 
 ## Что лежит на диске
 
