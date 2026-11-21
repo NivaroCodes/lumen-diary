@@ -45,8 +45,9 @@ WEATHER: dict[str, tuple[str, ...]] = {
     "fog": ("туман", "дымк"),
     "snow": ("снег", "снеж", "метел", "сугроб"),
     "sun": ("солнц", "солнеч", "ясн", "безоблачн"),
+    "cloud": ("пасмур", "облачн", "облак", "серо"),
 }
-_WEATHER_ORDER = ("rain", "fog", "snow", "sun")
+_WEATHER_ORDER = ("rain", "fog", "snow", "sun", "cloud")
 
 # Основы глаголов действия (прошедшее время и инфинитивы), небольшой список.
 ACTION_VERBS = (
@@ -85,16 +86,26 @@ NEUTRAL_WORDS: dict[str, tuple[str, ...]] = {
 # Слова, которые нельзя ставить в название: прилагательные в косвенных падежах,
 # служебные и общие слова. Название «Вечер, ясной и солнце» появилось из-за них.
 TITLE_BLOCKLIST = frozenset({
+    "пасмурной", "пасмурный", "пасмурно", "пасмурная", "облачной", "облачный", "облачно", "облачная", "серой", "серый", "серая",
     "ясной", "ясная", "ясный", "ясно", "ясного", "ясную", "ясным", "ясные", "ясных",
     "деталей", "детали", "детал", "дела", "дело", "погода", "погоды", "погоде",
     "день", "дня", "дню", "днём", "вечера", "вечером", "утра", "утром", "ночи", "ночью",
     "было", "была", "были", "стало", "очень", "просто", "потом", "вместе", "сегодня",
     "раз", "раза", "время", "времени",
     "отсидел", "отсидела", "отсидели",
+    # Наречия, местоимения, оценочные прилагательные и разговорная лексика.
+    "ничего", "особенного", "особенно", "тихий", "тихая", "тихо", "громко", "грустно",
+    "нормально", "короче", "много", "почти", "долго", "рано", "поздно", "хорошо",
+    "тепло", "тёплой", "тёплая", "солнечная", "солнечной", "солнечные", "слишком",
+    "совсем", "всего", "весь", "чилил", "лол", "кринж", "полный", "полная",
 })
 
+# Все основы словарей среды и погоды: слово, которое по ним совпало, считается «проверенным».
+DICTIONARY_STEMS = NATURE + CITY + HOME + tuple(s for stems in WEATHER.values() for s in stems)
+_LATIN_RE = re.compile(r"[a-z]")
+
 TIME_TITLE = {"morning": "Утро", "day": "День", "evening": "Вечер", "night": "Ночь"}
-WEATHER_TITLE = {"rain": "дождь", "fog": "туман", "snow": "снег", "sun": "солнце"}
+WEATHER_TITLE = {"rain": "дождь", "fog": "туман", "snow": "снег", "sun": "солнце", "cloud": "облака"}
 ENV_TITLE = {"nature": "природа", "city": "город", "home": "дом", "mixed": "прогулка"}
 
 
@@ -211,15 +222,23 @@ def make_title(profile: dict[str, Any]) -> str:
 
 
 def _titleable(word: str, taken: set[str]) -> bool:
-    """Слово годится в название: не занято и не в блок-листе."""
-    return word not in taken and word not in TITLE_BLOCKLIST
+    """Слово годится в название: не английское, не занято и не в блок-листе."""
+    return word not in taken and word not in TITLE_BLOCKLIST and _LATIN_RE.search(word) is None
 
 
 def _build_title(profile: dict[str, Any]) -> str:
     time_word = TIME_TITLE.get(profile.get("time_of_day", "unknown"))
-    tail = WEATHER_TITLE.get(profile.get("weather")) or ENV_TITLE.get(profile.get("environment"))
+    weather_tail = WEATHER_TITLE.get(profile.get("weather"))
+    tail = weather_tail or ENV_TITLE.get(profile.get("environment"))
     taken = {w.lower() for w in (time_word, tail) if w}
     keyword = next((k for k in profile.get("keywords") or [] if _titleable(k, taken)), None)
+
+    # Уверенные признаки: время суток, погода или среда, слово из словаря. Свободное слово
+    # из текста не считается. Если уверенных меньше двух — нейтральное название, а не случайное слово.
+    confident = sum([time_word is not None, tail is not None,
+                     keyword is not None and _match(keyword, DICTIONARY_STEMS)])
+    if confident < 2:
+        return f"{time_word} в записи" if time_word else FALLBACK_TITLE
 
     if time_word and keyword and tail:
         words = [time_word + ",", keyword, "и", tail]  # «Вечер, чай и дождь»
