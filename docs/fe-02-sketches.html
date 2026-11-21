@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lumen Diary — три эскиза FE‑02</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #f4f0e9; color: #231e19; font: 16px/1.5 system-ui, sans-serif; }
+  main { width: min(100% - 32px, 420px); margin-inline: auto; padding: 32px 0; }
+  header { margin-bottom: 24px; border-bottom: 1px solid #c8bfb1; padding-bottom: 20px; }
+  h1 { margin: 0; font: 400 clamp(40px, 6vw, 76px)/1 Georgia, serif; letter-spacing: -.05em; }
+  header p { margin: 12px 0 16px; color: #594d42; }
+  .controls { display: flex; gap: 12px 24px; flex-wrap: wrap; font-size: 14px; }
+  label { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+  input { accent-color: #4a3a2f; width: 16px; height: 16px; }
+  .series { display: grid; grid-template-columns: minmax(0, 420px); justify-content: center; gap: 18px; }
+  figure { margin: 0; }
+  figcaption { padding: 12px 0; color: #594d42; font-size: 14px; }
+  figcaption strong { display: block; color: #231e19; }
+  .full-title { display: block; overflow-wrap: anywhere; }
+  .card { position: relative; overflow: hidden; isolation: isolate; container-type: inline-size; aspect-ratio: 4 / 5;
+    background: radial-gradient(ellipse at var(--light), var(--glow), transparent 64%), var(--paper); color: var(--ink); }
+  .date, .photo, .line, .title, .signature, .grid { position: absolute; left: 6.666667%; width: 86.666667%; }
+  .date, .signature { font: 400 2.6cqw/1 Consolas, "Courier New", monospace; letter-spacing: .12em; }
+  .date { top: 5.333333%; }
+  .photo { top: 12.444444%; height: 48.888889%; overflow: hidden; background: var(--scene); outline: 1px solid var(--edge); }
+  .photo::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: var(--texture); opacity: var(--texture-opacity); }
+  .photo::before { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at var(--light), var(--photo-glow), transparent 65%); }
+  .motifs { position: absolute; inset: 0; overflow: hidden; }
+  .motifs span { position: absolute; display: block; background: var(--mark); opacity: var(--mark-opacity); }
+  .line { display: block; top: 64.444444%; height: 13.333333%; overflow: hidden; }
+  .line path { stroke: var(--line); stroke-width: 7; stroke-linejoin: round; stroke-linecap: round; fill: none; }
+  .line .halo { stroke: var(--halo); stroke-width: 13; }
+  .title { top: 79.407407%; height: 11.555556%; margin: 0; font: 400 6.3cqw/1.05 Georgia, serif;
+    letter-spacing: -.025em; overflow-wrap: anywhere; text-wrap: balance; }
+  .title-text { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; max-height: 2lh; overflow: hidden; }
+  .signature { top: 93.333333%; }
+  .grid { inset-block: 0; grid-template-columns: repeat(12, 1fr); gap: 2.222222cqw; display: none; pointer-events: none; }
+  .grid i { background: #e1337833; border-inline: 1px solid #e133787a; }
+  main:has(#show-grid:checked) .grid { display: grid; }
+  main:has(#blind:checked) :is(.date, .title, figcaption) { visibility: hidden; }
+  .calm { --paper: #182d33; --ink: #f8eee3; --light: 100% 38%; --glow: #576565; --photo-glow: #f5ddb570;
+    --line: #ffca9c; --halo: #1b3032; --edge: #bdad98; --mark: #f9d8b0; --mark-opacity: .44; --texture-opacity: .65;
+    --scene: linear-gradient(174deg, #42646b 0 54%, #5c7474 54% 58%, #2c494e 58% 68%, #193238 68%);
+    --texture: repeating-linear-gradient(108deg, transparent 0 10px, #cee5d441 11px, transparent 12px 32px); }
+  .calm .motifs span { height: 1px; border-radius: 50%; filter: blur(.35px); }
+  .energy { --paper: #ffc059; --ink: #2e210d; --light: 0% 31%; --glow: #fff0b1; --photo-glow: #fff1a062;
+    --line: #7a271d; --halo: #ffdd94; --edge: #7e411b; --mark: #fce6a1; --mark-opacity: .87; --texture-opacity: .29;
+    --scene: linear-gradient(125deg, transparent 0 51%, #562925 51% 68%, #332a29 68% 82%, #251d24 82%),
+      linear-gradient(151deg, #ffe7a3 0 41%, #ef982d 41% 60%, #b94d28 60%);
+    --texture: radial-gradient(#41251f 17%, transparent 25%) 0 0 / 4px 4px; }
+  .energy .motifs span { height: 2%; transform: skewY(-24deg); }
+  .dense { --paper: #ccd0ec; --ink: #25233e; --light: 50% 100%; --glow: #e6d9f9; --photo-glow: #e2d9ff8c;
+    --line: #42397b; --halo: #e0dcf5; --edge: #726e93; --mark: #302c59; --mark-opacity: .62; --texture-opacity: .85;
+    --scene: linear-gradient(150deg, #656888, #b2bad7 46%, #777797 70%, #444361);
+    --texture: radial-gradient(ellipse at 42% 62%, #ede8f9a6, transparent 65%),
+      repeating-linear-gradient(90deg, transparent 0 4px, #e8e5ff2a 5px, transparent 6px 13px); }
+  .dense .motifs span { height: var(--height); bottom: 7%; filter: blur(.45px); }
+  @media (min-width: 898px) {
+    main {
+      --series-row-width: 858px;
+      /* Keep 20px margins when the row fits, with 12.5px as the minimum. */
+      width: min(1320px, 100% - 25px, max(100% - 40px, var(--series-row-width)));
+      padding: 44px 0;
+    }
+    .series { grid-template-columns: repeat(2, minmax(0, 420px)); }
+  }
+  @media (898px <= width < 1336px) {
+    .series > figure:last-child:nth-child(odd) { grid-column: 1 / -1; justify-self: center; width: min(100%, 420px); }
+  }
+  @media (min-width: 1336px) {
+    main { --series-row-width: 1296px; }
+    .series { grid-template-columns: repeat(3, minmax(0, 420px)); }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Lumen Diary</h1>
+    <p>Визуальные эскизы FE‑02. В фоторамках — условные сцены.</p>
+    <div class="controls">
+      <label><input type="checkbox" id="show-grid"> Показать сетку</label>
+      <label><input type="checkbox" id="blind"> Сравнить без подписей</label>
+    </div>
+  </header>
+  <section class="series" aria-label="Три открытки">
+    <figure>
+      <div class="card calm">
+        <time class="date" datetime="2026-11-18">18.11.2026</time>
+        <div class="photo" role="img" aria-label="Условный кадр сумерек с дождём и тихой водой">
+          <div class="motifs" aria-hidden="true">
+            <span style="left:18%;top:70%;width:25%"></span><span style="left:42%;top:74%;width:30%"></span>
+            <span style="left:12%;top:85%;width:20%"></span><span style="left:56%;top:90%;width:27%"></span>
+          </div>
+        </div>
+        <svg class="line" viewBox="0 0 936 180" aria-hidden="true">
+          <path class="halo" d="M8 60 C160 60 280 65 398 82 S690 119 928 120"/>
+          <path d="M8 60 C160 60 280 65 398 82 S690 119 928 120"/>
+        </svg>
+        <h2 class="title"><span class="title-text">Дождь над тихой водой</span></h2>
+        <div class="signature">LUMEN DIARY</div>
+        <div class="grid" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+      <figcaption><strong>Тихий вечер</strong><span class="full-title">Дождь над тихой водой</span>Мягкий дождь, свободное поле и плавный спад линии.</figcaption>
+    </figure>
+    <figure>
+      <div class="card energy">
+        <time class="date" datetime="2026-11-19">19.11.2026</time>
+        <div class="photo" role="img" aria-label="Условный кадр яркого утра с диагоналями на городской улице">
+          <div class="motifs" aria-hidden="true">
+            <span style="left:55%;top:23%;width:13%"></span><span style="left:65%;top:28%;width:17%"></span>
+            <span style="left:50%;top:40%;width:16%"></span><span style="left:62%;top:44%;width:22%"></span>
+            <span style="left:53%;top:54%;width:13%"></span><span style="left:71%;top:55%;width:17%"></span>
+            <span style="left:67%;top:65%;width:21%"></span>
+          </div>
+        </div>
+        <svg class="line" viewBox="0 0 936 180" aria-hidden="true">
+          <path class="halo" d="M8 153 L104 145 143 154 205 122 268 131 330 103 386 116 451 92 503 100 566 67 614 82 684 48 737 58 818 30 862 42 928 27"/>
+          <path d="M8 153 L104 145 143 154 205 122 268 131 330 103 386 116 451 92 503 100 566 67 614 82 684 48 737 58 818 30 862 42 928 27"/>
+        </svg>
+        <h2 class="title"><span class="title-text">Первый трамвай ловит солнце</span></h2>
+        <div class="signature">LUMEN DIARY</div>
+        <div class="grid" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+      <figcaption><strong>Энергичное утро</strong><span class="full-title">Первый трамвай ловит солнце</span>Жёсткие диагонали, резкий подъём и крупный размах.</figcaption>
+    </figure>
+    <figure>
+      <div class="card dense">
+        <time class="date" datetime="2026-11-20">20.11.2026</time>
+        <div class="photo" role="img" aria-label="Условный кадр города с частыми силуэтами зданий в тумане">
+          <div class="motifs" aria-hidden="true">
+            <span style="left:4%;width:5%;--height:44%"></span><span style="left:11%;width:6%;--height:59%"></span>
+            <span style="left:19%;width:5%;--height:49%"></span><span style="left:25%;width:8%;--height:70%"></span>
+            <span style="left:35%;width:5%;--height:37%"></span><span style="left:42%;width:6%;--height:53%"></span>
+            <span style="left:50%;width:7%;--height:65%"></span><span style="left:59%;width:5%;--height:55%"></span>
+            <span style="left:65%;width:8%;--height:72%"></span><span style="left:75%;width:6%;--height:41%"></span>
+            <span style="left:83%;width:6%;--height:60%"></span><span style="left:92%;width:4%;--height:47%"></span>
+          </div>
+        </div>
+        <svg class="line" viewBox="0 0 936 180" aria-hidden="true">
+          <path class="halo" d="M8 90 Q53 35 105 53 T225 98 T365 94 T510 75 T649 108 T783 105 T928 90"/>
+          <path d="M8 90 Q53 35 105 53 T225 98 T365 94 T510 75 T649 108 T783 105 T928 90"/>
+        </svg>
+        <h2 class="title"><span class="title-text">Между встречами город в тумане</span></h2>
+        <div class="signature">LUMEN DIARY</div>
+        <div class="grid" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+      <figcaption><strong>Насыщенный день</strong><span class="full-title">Между встречами город в тумане</span>Плотный городской ритм, туман и повторяющаяся волна.</figcaption>
+    </figure>
+  </section>
+</main>
+</body>
+</html>
