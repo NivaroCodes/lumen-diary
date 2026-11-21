@@ -1,0 +1,119 @@
+.postcard {
+  position: relative;
+  isolation: isolate;
+  container-type: inline-size;
+  width: 100%;
+  max-width: 420px;
+  margin-inline: auto;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--paper-color);
+  background: radial-gradient(ellipse var(--paper-radius) at var(--light-origin) in srgb, var(--paper-light), var(--paper-color));
+  color: #f8eee3;
+}
+
+.postcard-date,
+.postcard-frame,
+.postcard-line,
+.postcard-title,
+.postcard-signature {
+  position: absolute;
+  left: 6.666667%;
+  width: 86.666667%;
+}
+
+.postcard-date,
+.postcard-signature {
+  font: 400 2.6cqw/1 Consolas, "Courier New", monospace;
+  letter-spacing: .12em;
+}
+
+.postcard-date { top: 5.333333%; }
+.postcard-signature { top: 93.333333%; }
+
+.postcard-frame {
+  top: 12.444444%;
+  height: 48.888889%;
+  overflow: hidden;
+  background: #202128;
+  outline: 1px solid color-mix(in srgb, var(--frame-color), #a99b8a);
+}
+
+.postcard-photos {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-auto-rows: minmax(0, 1fr);
+  gap: 1.111111cqw;
+  height: 100%;
+}
+
+.postcard-photos > .day-photo { grid-column: span 3; }
+
+.postcard-photos img {
+  filter: brightness(var(--photo-brightness)) contrast(var(--photo-contrast))
+    saturate(var(--photo-saturation)) blur(var(--photo-blur));
+}
+
+.postcard-photos[data-count="0"] > .day-photo,
+.postcard-photos[data-count="1"] > .day-photo { grid-column: 1 / -1; }
+.postcard-photos[data-count="3"] > .day-photo:first-child { grid-row: span 2; }
+.postcard-photos[data-count="5"] > .day-photo:nth-child(n + 3) { grid-column: span 2; }
+
+.postcard-light,
+.postcard-grain,
+.postcard-weather,
+.postcard-marks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.postcard-light {
+  background: radial-gradient(ellipse at var(--light-origin), var(--light-color), transparent 72%);
+  mix-blend-mode: screen;
+}
+.postcard-grain {
+  background: radial-gradient(#fff8 18%, transparent 26%) 0 0 / 3px 3px,
+    radial-gradient(#000c 15%, transparent 29%) 2px 1px / 4px 4px;
+  opacity: var(--grain-opacity);
+}
+.postcard-frame[data-weather="rain"] .postcard-weather {
+  background: repeating-linear-gradient(108deg, transparent 0 13px, #ebf4ff55 14px, transparent 15px 24px);
+}
+.postcard-frame[data-weather="fog"] .postcard-weather {
+  background: radial-gradient(ellipse at 40% 80%, #e4e8ef88, transparent 72%);
+}
+.postcard-marks {
+  width: 100%;
+  height: 100%;
+  fill: color-mix(in srgb, var(--mark-color) 65%, #f8eee3);
+}
+
+.postcard-line {
+  display: block;
+  top: 64.444444%;
+  height: 13.333333%;
+}
+.postcard-line path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.postcard-line-outline { stroke: var(--line-outline); stroke-width: 12; }
+.postcard-line-stroke { stroke: var(--line-color); stroke-width: 7; }
+
+.postcard-title {
+  top: 79.407407%;
+  height: 11.555556%;
+  font: 400 6.3cqw/1.05 Georgia, serif;
+  letter-spacing: -.025em;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.postcard-title span {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  max-height: 2lh;
+  overflow: hidden;
+}
