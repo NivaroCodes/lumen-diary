@@ -96,6 +96,7 @@ DAYS = [
         "photos": [park(0), park(1), park(2)],
         "place": "Парк у пруда",
         "weather": "sun",
+        # Ссылка на реальный трек; название песни НЕ подставлено — требует проверки перед показом.
         "music": {"music_url": "https://open.spotify.com/track/61iJknbAXSuBflDz3vSQ0b",
                   "music_description": "медленная, светлая, тёплая акустика",
                   # inferMusicHints: «медлен» → 68 BPM, энергия 0.25; «светл» → мажор
@@ -111,7 +112,8 @@ DAYS = [
         "photos": [office(0), office(1)],
         "place": "Офис команды",
         "weather": None,
-        "music": {"music_url": "https://www.youtube.com/watch?v=jfKfPfyJRdk",
+        # Ссылка на песню НЕ выбрана: плеер не показывается. Проигрывание добавит команда.
+        "music": {"music_url": "https://example.com/song-not-chosen",
                   "music_description": "быстрая, энергичная электроника, тёмная",
                   # «быстр» → 128 BPM, 0.85; «тёмн» → минор; «электрон» → electronic
                   "music_tempo_bpm": "128", "music_energy": "0.85", "music_mode": "minor",
@@ -125,7 +127,8 @@ DAYS = [
         "photos": [rain(0), rain(1)],
         "place": None,
         "weather": "rain",
-        "music": {"music_url": "https://www.youtube.com/watch?v=CvFH_6DNRCY",
+        # Ссылка на песню НЕ выбрана: плеер не показывается. Проигрывание добавит команда.
+        "music": {"music_url": "https://example.com/song-not-chosen",
                   "music_description": "умеренная, грустная, с пианино",
                   # «умерен» → 100 BPM, 0.55; «груст» → минор; пианино жанр не задаёт
                   "music_tempo_bpm": "100", "music_energy": "0.55", "music_mode": "minor"},
