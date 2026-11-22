@@ -1,3 +1,5 @@
+import type { VisualModel } from './components/postcard-model'
+
 export class DayApiError extends Error {
   readonly status: number
   readonly field?: string
@@ -27,6 +29,121 @@ export async function createDay(body: FormData) {
     throw new DayApiError('Сервер не вернул идентификатор записи.', response.status)
   }
   return { id: day.id }
+}
+
+export interface DaySummary {
+  id: string
+  title: string
+  date: string
+  preview_url: string | null
+}
+
+export interface MusicRecord {
+  type?: string
+  url?: string
+  description?: string
+  title?: string | null
+  artist?: string | null
+  genre?: string | null
+  tempo_bpm?: number | null
+}
+
+export interface ExplainItem {
+  param: string
+  value?: unknown
+  text_ru: string
+}
+
+export interface DayRecord {
+  id: string
+  title: string
+  date: string
+  text: string
+  photos: string[]
+  music: MusicRecord
+  visual: VisualModel
+  explain: ExplainItem[]
+  profile: Record<string, unknown>
+}
+
+const requestTimeoutMs = 10_000
+
+function isAbortError(error: unknown) {
+  return typeof error === 'object' && error !== null && (error as { name?: unknown }).name === 'AbortError'
+}
+
+// Общий GET: таймаут, ошибки сети и разбор JSON превращаются в DayApiError, а не в падение страницы.
+async function getJson(url: string): Promise<unknown> {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), requestTimeoutMs)
+  const timeoutMessage = 'Сервер не ответил за 10 секунд. Попробуйте ещё раз.'
+  try {
+    let response: Response
+    try {
+      response = await fetch(url, { headers: { Accept: 'application/json' }, signal: controller.signal })
+    } catch (error) {
+      throw isAbortError(error)
+        ? new DayApiError(timeoutMessage, 0)
+        : new DayApiError('Не удалось связаться с сервером. Попробуйте ещё раз.', 0)
+    }
+    if (!response.ok) {
+      const error = await response.json().catch(() => null) as { message?: unknown } | null
+      const message = typeof error?.message === 'string' ? error.message : (
+        response.status === 404 ? 'Запись не найдена.' : 'Сервер не смог обработать запрос. Попробуйте ещё раз.'
+      )
+      throw new DayApiError(message, response.status)
+    }
+    try {
+      return await response.json()
+    } catch (error) {
+      throw isAbortError(error)
+        ? new DayApiError(timeoutMessage, response.status)
+        : new DayApiError('Сервер вернул некорректные данные.', response.status)
+    }
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function isDaySummary(value: unknown): value is DaySummary {
+  return isObject(value)
+    && typeof value.id === 'string'
+    && typeof value.title === 'string'
+    && typeof value.date === 'string'
+    && (typeof value.preview_url === 'string' || value.preview_url === null)
+}
+
+function isDayRecord(value: unknown): value is DayRecord {
+  return isObject(value)
+    && typeof value.id === 'string'
+    && typeof value.title === 'string'
+    && typeof value.date === 'string'
+    && typeof value.text === 'string'
+    && Array.isArray(value.photos)
+    && value.photos.every((photo) => typeof photo === 'string')
+    && isObject(value.music)
+    && isObject(value.visual)
+    && Array.isArray(value.explain)
+    && value.explain.every((item) => isObject(item) && typeof item.param === 'string' && typeof item.text_ru === 'string')
+    && isObject(value.profile)
+}
+
+export async function getDay(id: string): Promise<DayRecord> {
+  const data = await getJson(`/api/days/${encodeURIComponent(id)}`)
+  if (!isDayRecord(data)) throw new DayApiError('Сервер вернул некорректные данные.', 0)
+  return data
+}
+
+export async function listDays(): Promise<DaySummary[]> {
+  const data = await getJson('/api/days?sort=date_desc')
+  if (!Array.isArray(data) || !data.every(isDaySummary)) {
+    throw new DayApiError('Сервер вернул некорректные данные.', 0)
+  }
+  return data
 }
 
 export function errorMessage(error: unknown) {
