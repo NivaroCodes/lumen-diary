@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate } from 'react-router'
 import { createDay, DayApiError, errorMessage, isMusicUrl } from '../days-api'
+import { inferMusicHints } from '../music-hints'
+import type { Mode, Tempo } from '../music-hints'
 
 const panel = 'min-w-0 space-y-3 rounded-(--radius-md) border border-(--color-border) bg-(--color-surface) p-4 sm:p-5'
 const fieldStyle = 'w-full rounded-(--radius-sm) border border-(--color-border) bg-(--color-background) px-3 py-2 aria-invalid:border-red-400'
@@ -23,11 +25,20 @@ const musicTextFields = [
 ]
 const musicNumberFields = [
   { name: 'music_year', label: 'Год выпуска', min: 1900, max: currentYear, step: 1 },
-  { name: 'music_tempo_bpm', label: 'Темп (BPM)', min: 40, max: 220, step: 'any' },
-  { name: 'music_energy', label: 'Энергия', min: 0, max: 1, step: 'any' },
 ]
+const tempoOptions: { value: Tempo; label: string }[] = [
+  { value: 'slow', label: 'Медленно' },
+  { value: 'medium', label: 'Средне' },
+  { value: 'fast', label: 'Быстро' },
+]
+const moodOptions: { value: Mode; label: string }[] = [
+  { value: 'major', label: 'Светлое' },
+  { value: 'minor', label: 'Тёмное' },
+]
+// Поля, которых нет в форме как отдельных элементов: их ошибки показываем в разделе «Уточнить».
+const refineFields = ['music_tempo_bpm', 'music_energy', 'music_mode']
 const dayFormFields = [
-  'text', 'date', 'music_url', 'music_description', 'music_genre', 'music_mode',
+  'text', 'date', 'music_url', 'music_description', 'music_genre',
   ...musicTextFields.map(({ name }) => name),
   ...musicNumberFields.map(({ name }) => name),
 ]
@@ -64,7 +75,7 @@ function validatePhotos(files: File[]) {
   return ''
 }
 
-function validateMusic(form: HTMLFormElement, data: FormData) {
+function validateMusic(form: HTMLFormElement, data: FormData, choices: { tempo?: Tempo; mode?: Mode }) {
   const errors: Record<string, string> = {}
   const url = trimField(String(data.get('music_url') ?? ''))
   const description = normalizeTextarea(String(data.get('music_description') ?? ''))
@@ -109,9 +120,17 @@ function validateMusic(form: HTMLFormElement, data: FormData) {
     }
   }
 
-  for (const name of ['music_genre', 'music_mode']) {
-    if (!data.get(name)) data.delete(name)
-  }
+  if (!data.get('music_genre')) data.delete('music_genre')
+
+  // Темп, энергия и лад: явный выбор, иначе оценка по фразе. Отправляем только заданное.
+  const { tempo_bpm, energy, mode, genre } = inferMusicHints(description, {
+    ...choices,
+    genre: String(data.get('music_genre') ?? '') || undefined,
+  })
+  if (tempo_bpm !== undefined) data.set('music_tempo_bpm', String(tempo_bpm))
+  if (energy !== undefined) data.set('music_energy', String(energy))
+  if (mode) data.set('music_mode', mode)
+  if (genre) data.set('music_genre', genre)
   return errors
 }
 
@@ -151,6 +170,8 @@ export default function CreateDayPage() {
   const nextPhotoId = useRef(0)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [pending, setPending] = useState(false)
+  const [tempo, setTempo] = useState<Tempo>()
+  const [mood, setMood] = useState<Mode>()
   const submitting = useRef(false)
   const errorFocus = useRef<string | null>(null)
 
@@ -179,7 +200,7 @@ export default function CreateDayPage() {
     if (textError) fieldErrors.text = textError
     const photoError = validatePhotos(photos.map(({ file }) => file))
     if (photoError) fieldErrors.photos = photoError
-    Object.assign(fieldErrors, validateMusic(form, data))
+    Object.assign(fieldErrors, validateMusic(form, data, { tempo, mode: mood }))
     setErrors(fieldErrors)
     const firstError = Object.keys(fieldErrors)[0]
     if (firstError) {
@@ -198,8 +219,8 @@ export default function CreateDayPage() {
     } catch (error) {
       const name = error instanceof DayApiError ? error.field : undefined
       const control = name ? form.elements.namedItem(name) : null
-      const key = name && control instanceof HTMLElement && control.id === name ? name : 'form'
-      errorFocus.current = key === 'form' ? 'form-error' : key
+      const key = name && (refineFields.includes(name) || (control instanceof HTMLElement && control.id === name)) ? name : 'form'
+      errorFocus.current = key === 'form' ? 'form-error' : refineFields.includes(key) ? 'music-refine' : key
       setErrors({ [key]: errorMessage(error) })
       submitting.current = false
       setPending(false)
@@ -299,13 +320,14 @@ export default function CreateDayPage() {
             <label htmlFor="music_url" className="block text-sm">Ссылка на песню</label>
             <input {...musicField('music_url')} type="url" required placeholder="https://…" />
             {feedback('music_url')}
-            <label htmlFor="music_description" className="block text-sm">Описание песни</label>
-            <p id="music-description-hint" className={mutedText}>Опишите темп, настроение или жанр. До {maxMusicDescriptionLength} символов.</p>
+            <label htmlFor="music_description" className="block text-sm">Как звучит песня</label>
+            <p id="music-description-hint" className={mutedText}>Например: медленная, тихая, с пианино. До {maxMusicDescriptionLength} символов.</p>
+            <p className={mutedText}>Система оценит темп и настроение по этой фразе. Вы можете уточнить это ниже.</p>
             <textarea {...musicField('music_description')} required rows={3}
               className={fieldStyle + ' resize-y text-base ' + focusOutline} aria-describedby="music-description-hint music_description-error" />
             {feedback('music_description')}
             <details>
-              <summary className={'cursor-pointer rounded text-sm underline ' + focusOutline}>Добавить сведения о песне</summary>
+              <summary id="music-refine" tabIndex={-1} className={'cursor-pointer rounded text-sm underline ' + focusOutline}>Уточнить, если хотите</summary>
               <div className="mt-3 grid gap-3 sm:grid-cols-2">
                 {musicTextFields.map(({ name, label }) => (
                   <div key={name} className="min-w-0 space-y-1">
@@ -329,13 +351,31 @@ export default function CreateDayPage() {
                   </select>
                   {feedback('music_genre')}
                 </div>
-                <div className="min-w-0 space-y-1">
-                  <label htmlFor="music_mode" className="block text-sm">Лад</label>
-                  <select {...musicField('music_mode')}>
-                    <option value="">Не указан</option>
-                    <option value="major">Мажор</option>
-                    <option value="minor">Минор</option>
-                  </select>
+                <div className="min-w-0 space-y-1" role="group" aria-labelledby="music-tempo-label">
+                  <span id="music-tempo-label" className="block text-sm">Темп</span>
+                  <div className="flex flex-wrap gap-2">
+                    {tempoOptions.map(({ value, label }) => (
+                      <button key={value} type="button" aria-pressed={tempo === value}
+                        className={'rounded-(--radius-sm) border border-(--color-border) px-3 py-2 text-sm aria-pressed:border-(--color-accent) aria-pressed:font-semibold ' + focusOutline}
+                        onClick={() => { setTempo(tempo === value ? undefined : value); setErrors((p) => ({ ...p, music_tempo_bpm: '', music_energy: '' })) }}>
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                  {feedback('music_tempo_bpm')}
+                  {feedback('music_energy')}
+                </div>
+                <div className="min-w-0 space-y-1" role="group" aria-labelledby="music-mood-label">
+                  <span id="music-mood-label" className="block text-sm">Настроение</span>
+                  <div className="flex flex-wrap gap-2">
+                    {moodOptions.map(({ value, label }) => (
+                      <button key={value} type="button" aria-pressed={mood === value}
+                        className={'rounded-(--radius-sm) border border-(--color-border) px-3 py-2 text-sm aria-pressed:border-(--color-accent) aria-pressed:font-semibold ' + focusOutline}
+                        onClick={() => { setMood(mood === value ? undefined : value); setErrors((p) => ({ ...p, music_mode: '' })) }}>
+                        {label}
+                      </button>
+                    ))}
+                  </div>
                   {feedback('music_mode')}
                 </div>
               </div>
