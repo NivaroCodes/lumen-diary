@@ -141,10 +141,10 @@ def build_visual(profile: dict[str, Any], seed: int, caption: str) -> tuple[dict
     tempo = None if tempo is None or tempo <= 0 else tempo
     blur = 0.1 if tempo is None else 0.6 if tempo < 80 else 0.3 if tempo <= 110 else 0.1
     add("texture.blur", blur, "R-TEX-03", "music.tempo_bpm", tempo,
-        {0.6: "Медленный темп песни, введённый вами, делает изображение мягче.",
-         0.3: "Средний темп песни, введённый вами, даёт умеренную мягкость."}.get(blur, (
+        {0.6: "Медленный темп песни (оценён по описанию или выбран) делает изображение мягче.",
+         0.3: "Средний темп песни (оценён по описанию или выбран) даёт умеренную мягкость."}.get(blur, (
             "Темп не указан, поэтому изображение остаётся чётким." if tempo is None
-            else "Быстрый темп песни, введённый вами, оставляет изображение чётким.")),
+            else "Быстрый темп песни (оценён по описанию или выбран) оставляет изображение чётким.")),
         _prov(tempo, music_prov))
 
     # --- линия ---
@@ -159,9 +159,9 @@ def build_visual(profile: dict[str, Any], seed: int, caption: str) -> tuple[dict
     amplitude = 0.3 if energy is None else _round2(0.1 + 0.8 * energy)
     add("line.amplitude", amplitude, "R-LINE-02", "music.energy", energy,
         "Энергия песни не указана, размах линии нейтральный." if energy is None
-        else "Высокая энергия песни, введённая вами, задаёт большой размах линии." if energy >= 0.6
-        else "Низкая энергия песни, введённая вами, задаёт небольшой размах линии." if energy < 0.4
-        else "Средняя энергия песни, введённая вами, задаёт средний размах линии.",
+        else "Высокая энергия песни (оценена по описанию или выбрана) задаёт большой размах линии." if energy >= 0.6
+        else "Низкая энергия песни (оценена по описанию или выбрана) задаёт небольшой размах линии." if energy < 0.4
+        else "Средняя энергия песни (оценена по описанию или выбрана) задаёт средний размах линии.",
         _prov(energy, music_prov))
 
     genre = (music.get("genre") or "unknown").lower()
@@ -170,10 +170,10 @@ def build_visual(profile: dict[str, Any], seed: int, caption: str) -> tuple[dict
     rough_genre = genre in ROUGH_GENRES
     add("line.roughness", roughness, "R-LINE-03",
         "music.genre" if rough_genre else "music.energy", genre if rough_genre else energy,
-        "Жанр, введённый вами, и энергия песни делают линию резче." if rough_genre
+        "Жанр (оценён по описанию или выбран) и энергия песни делают линию резче." if rough_genre
         else "Энергия песни не указана, линия остаётся гладкой." if energy is None
         else "Спокойная музыка даёт гладкую линию." if energy < 0.4
-        else "Энергия песни, введённая вами, добавляет линии шероховатость.",
+        else "Энергия песни (оценена по описанию или выбрана) добавляет линии шероховатость.",
         music_prov if rough_genre else _prov(energy, music_prov))
 
     add("line.color_index", 0, "R-LINE-04", "system", None,
@@ -196,8 +196,8 @@ def build_visual(profile: dict[str, Any], seed: int, caption: str) -> tuple[dict
     contrast = 0.3 + 0.4 * p_contrast + (0.1 if mode == "minor" else -0.05 if mode == "major" else 0.0)
     contrast = _round2(_clamp(contrast, 0.0, 1.0))
     add("contrast", contrast, "R-CON-01", "music.mode", mode,
-        {"minor": "Минорный лад, введённый вами, добавляет контраст к контрасту фото.",
-         "major": "Мажорный лад, введённый вами, слегка смягчает контраст фото."}.get(
+        {"minor": "Минорный лад (оценён по описанию или выбран) добавляет контраст к контрасту фото.",
+         "major": "Мажорный лад (оценён по описанию или выбран) слегка смягчает контраст фото."}.get(
             mode, "Лад не указан, контраст задаёт только фото."),
         music_prov if mode in ("minor", "major") else "measured")
 
