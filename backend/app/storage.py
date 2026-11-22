@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import sqlite3
 import uuid
@@ -44,6 +45,35 @@ class NewDay:
     visual: dict[str, Any]
     explain: list[dict[str, Any]]
     photos: list[bytes]  # очищенные JPEG без EXIF
+
+
+_FORBIDDEN_CHARS = re.compile(r'[<>:"/\\|?*\x00-\x1f\x7f]')
+_RESERVED_NAMES = {"CON", "PRN", "AUX", "NUL", *(f"COM{i}" for i in range(1, 10)), *(f"LPT{i}" for i in range(1, 10))}
+_MAX_TITLE_LEN = 80
+_EMPTY_TITLE = "День"
+
+
+def _sanitize_title(title: str) -> str:
+    clean = _FORBIDDEN_CHARS.sub(" ", title)
+    clean = re.sub(r"\s+", " ", clean).strip(" .")
+    if len(clean) > _MAX_TITLE_LEN:
+        cut = clean[:_MAX_TITLE_LEN]
+        # обрезаем по границе слова, если следующий символ не пробел (слово разрезано)
+        if clean[_MAX_TITLE_LEN] != " " and " " in cut:
+            cut = cut.rsplit(" ", 1)[0]
+        clean = cut.rstrip(" .")
+    return clean
+
+
+def build_folder_name(date: str, title: str, day_id: str) -> str:
+    """Имя папки дня: ``YYYY-MM-DD <название>``, безопасное для Windows и Linux."""
+    clean = _sanitize_title(title)
+    suffix = day_id[:6]
+    if not clean:
+        clean = f"{_EMPTY_TITLE} {suffix}"
+    elif clean.split(".")[0].strip().upper() in _RESERVED_NAMES:
+        clean = f"{clean} {suffix}"
+    return f"{date} {clean}"
 
 
 def _dump(obj: Any) -> str:
@@ -110,14 +140,28 @@ class Storage:
         """Сохраняет день и возвращает его id."""
         self._ensure()
         day_id = str(uuid.uuid4())
-        folder = f"{day.date}_{day_id[:8]}"
+        base_folder = build_folder_name(day.date, day.title, day_id)
         created_at = datetime.now(timezone.utc).isoformat(timespec="microseconds")
         tmp = self.tmp_dir / day_id
+        folder = base_folder
         final = self.days_dir / folder
         conn: sqlite3.Connection | None = None
+        created = False
         try:
             self._write_day_files(tmp, day_id, day, created_at)
-            tmp.rename(final)
+            attempt = 1
+            while True:  # коллизия имён: " (2)", " (3)"; существующие папки не трогаем
+                if not final.exists():
+                    try:
+                        tmp.rename(final)
+                        created = True
+                        break
+                    except OSError:
+                        if not final.exists():
+                            raise
+                attempt += 1
+                folder = f"{base_folder} ({attempt})"
+                final = self.days_dir / folder
             conn = self._connect()
             conn.execute(
                 "INSERT INTO days (id, date, title, folder, created_at, text, music_json,"
@@ -131,7 +175,8 @@ class Storage:
             if conn is not None:
                 conn.rollback()
             shutil.rmtree(tmp, ignore_errors=True)
-            shutil.rmtree(final, ignore_errors=True)
+            if created:
+                shutil.rmtree(final, ignore_errors=True)
             raise
         finally:
             if conn is not None:
@@ -164,6 +209,7 @@ class Storage:
             "id": r["id"],
             "title": r["title"],
             "date": r["date"],
+            "folder": r["folder"],
             "text": r["text"],
             "photos": [media_url(r["id"], i) for i in range(1, _photo_count(r["profile_json"]) + 1)],
             "music": json.loads(r["music_json"]),

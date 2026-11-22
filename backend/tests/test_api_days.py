@@ -47,7 +47,7 @@ def three_days(client):
 
 def test_create_returns_full_record(three_days):
     record = three_days["day-calm"]
-    assert set(record) == {"id", "title", "date", "text", "photos", "music", "visual", "explain", "profile"}
+    assert set(record) == {"id", "title", "date", "folder", "text", "photos", "music", "visual", "explain", "profile"}
     assert record["date"] == "2026-11-14"
     assert len(record["photos"]) == 3
     assert 3 <= len(record["title"].split()) <= 7
@@ -57,10 +57,12 @@ def test_create_returns_full_record(three_days):
 
 def test_three_folders_named_by_template(three_days, settings):
     folders = sorted(p.name for p in (settings.data_dir / "days").iterdir())
-    expected = sorted(f"{d['date']}_{d['id'][:8]}" for d in three_days.values())
+    expected = sorted(d["folder"] for d in three_days.values())
+    for d in three_days.values():
+        assert d["folder"] == f"{d['date']} {d['title']}"
     assert folders == expected
     for d in three_days.values():
-        root = settings.data_dir / "days" / f"{d['date']}_{d['id'][:8]}"
+        root = settings.data_dir / "days" / d["folder"]
         assert {p.name for p in root.iterdir()} == {
             "entry.json", "photos", "profile.json", "visual.json", "explain.json", "memory.json"}
         assert sorted(p.name for p in (root / "photos").iterdir()) == [
@@ -77,7 +79,7 @@ def test_three_folders_named_by_template(three_days, settings):
 
 def test_saved_photos_have_no_exif(three_days, settings):
     for d in three_days.values():
-        root = settings.data_dir / "days" / f"{d['date']}_{d['id'][:8]}" / "photos"
+        root = settings.data_dir / "days" / d["folder"] / "photos"
         for path in root.iterdir():
             with Image.open(path) as img:
                 assert img.format == "JPEG"
@@ -188,3 +190,24 @@ def test_media_served_and_unknown_is_404(client, three_days):
 def test_cors_header_for_configured_origin(client):
     resp = client.get("/health", headers={"Origin": "http://localhost:5173"})
     assert resp.headers["access-control-allow-origin"] == "http://localhost:5173"
+
+
+def test_new_day_media_served_from_titled_folder(client, three_days):
+    d = three_days["day-calm"]
+    assert client.get(client.get(f"/api/days/{d['id']}").json()["photos"][0]).status_code == 200
+
+
+def test_legacy_folder_day_still_readable(client, settings, three_days):
+    """Папка старого формата <date>_<id8> продолжает работать: путь берётся из БД."""
+    import sqlite3
+
+    d = three_days["day-energy"]
+    legacy = f"{d['date']}_{d['id'][:8]}"
+    days = settings.data_dir / "days"
+    (days / d["folder"]).rename(days / legacy)
+    with sqlite3.connect(settings.data_dir / "lumen.sqlite3") as conn:
+        conn.execute("UPDATE days SET folder = ? WHERE id = ?", (legacy, d["id"]))
+    got = client.get(f"/api/days/{d['id']}")
+    assert got.status_code == 200 and got.json()["folder"] == legacy
+    assert d["id"] in {i["id"] for i in client.get("/api/days").json()}
+    assert client.get(got.json()["photos"][0]).status_code == 200
