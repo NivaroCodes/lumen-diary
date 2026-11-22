@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { CSSProperties, FormEvent } from 'react'
 import { useNavigate } from 'react-router'
-import { createDay, DayApiError, errorMessage, isMusicUrl } from '../days-api'
+import { createDay, DayApiError, errorMessage, isMusicUrl, normalizeMusicUrl } from '../days-api'
 import { inferMusicHints } from '../music-hints'
 import type { Mode, Tempo } from '../music-hints'
 import './create-day.css'
@@ -90,6 +90,7 @@ function validateMusic(form: HTMLFormElement, data: FormData, choices: { tempo?:
   else if (!/^https?:\/\/[^/?#\\]/i.test(url) || !isMusicUrl(url)) {
     errors.music_url = 'Укажите адрес песни, который начинается с https:// или http://.'
   }
+  else data.set('music_url', normalizeMusicUrl(url))
 
   if (!description) errors.music_description = 'Коротко опишите песню.'
   else if ([...description].length > maxMusicDescriptionLength) {
