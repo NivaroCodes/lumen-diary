@@ -1,15 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
-import type { FormEvent } from 'react'
+import type { CSSProperties, FormEvent } from 'react'
 import { useNavigate } from 'react-router'
 import { createDay, DayApiError, errorMessage, isMusicUrl } from '../days-api'
 import { inferMusicHints } from '../music-hints'
 import type { Mode, Tempo } from '../music-hints'
+import './create-day.css'
 
-const panel = 'min-w-0 space-y-3 rounded-(--radius-md) border border-(--color-border) bg-(--color-surface) p-4 sm:p-5'
-const fieldStyle = 'w-full rounded-(--radius-sm) border border-(--color-border) bg-(--color-background) px-3 py-2 aria-invalid:border-red-400'
-const mutedText = 'text-sm text-(color:--color-text-muted)'
-const focusOutline = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-accent)'
-const errorStyle = 'wrap-anywhere text-sm text-red-300'
 const formats = ['image/jpeg', 'image/png', 'image/webp']
 const maxPhotos = 5
 const maxPhotoSizeMb = 10
@@ -42,6 +38,11 @@ const dayFormFields = [
   ...musicTextFields.map(({ name }) => name),
   ...musicNumberFields.map(({ name }) => name),
 ]
+// Значения по умолчанию только для отображения (подсветка чипов и карточка), в отправку не уходят.
+const defaultTempo: Tempo = 'medium'
+const defaultMood: Mode = 'minor'
+// Положение капель в картинке «Атмосфера дня» (в координатах viewBox 320×224).
+const dropX = [36, 84, 124, 196, 236, 284]
 
 type SelectedPhoto = { id: number; file: File }
 
@@ -143,23 +144,16 @@ function PhotoPreview({ file, onRemove }: { file: File; onRemove: () => void }) 
     return () => URL.revokeObjectURL(url)
   }, [file])
   return (
-    <li className="flex items-start gap-3 sm:items-center">
+    <li className="lm-photo-item">
       {previewFailed ? (
-        <span className="grid size-16 shrink-0 place-items-center rounded bg-(--color-background) px-1 text-center text-xs">Нет превью</span>
+        <span className="lm-thumb lm-thumb-fallback">Нет превью</span>
       ) : (
-        <img ref={image} alt="" onError={() => setPreviewFailed(true)} className="size-16 shrink-0 rounded object-cover" />
+        <img ref={image} alt="" onError={() => setPreviewFailed(true)} className="lm-thumb" />
       )}
-      <div className="min-w-0 flex-1 sm:flex sm:items-center sm:gap-3">
-        <span className="block min-w-0 wrap-anywhere text-sm sm:flex-1">{file.name}</span>
-        <button
-          type="button"
-          className={'shrink-0 rounded py-2 text-sm underline sm:px-2 ' + focusOutline}
-          onClick={onRemove}
-          aria-label={`Удалить ${file.name}`}
-        >
-          Удалить
-        </button>
-      </div>
+      <span className="lm-photo-name">{file.name}</span>
+      <button type="button" className="lm-link-button" onClick={onRemove} aria-label={`Удалить ${file.name}`}>
+        Удалить
+      </button>
     </li>
   )
 }
@@ -170,10 +164,14 @@ export default function CreateDayPage() {
   const nextPhotoId = useRef(0)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [pending, setPending] = useState(false)
+  // undefined = пользователь ничего не выбрал: в отправку ничего не уходит, темп и лад берутся из описания.
   const [tempo, setTempo] = useState<Tempo>()
   const [mood, setMood] = useState<Mode>()
   const submitting = useRef(false)
   const errorFocus = useRef<string | null>(null)
+  // Только отображение: карточка и подсветка чипов показывают умолчания, но в отправку они не попадают.
+  const tempoValue: Tempo = tempo ?? defaultTempo
+  const moodValue: Mode = mood ?? defaultMood
 
   useEffect(() => {
     if (pending || !errorFocus.current) return
@@ -227,14 +225,13 @@ export default function CreateDayPage() {
     }
   }
 
-  function field(name: string) {
-    return { id: name, name, className: fieldStyle, 'aria-invalid': Boolean(errors[name]), 'aria-describedby': `${name}-error` }
+  function field(name: string, className = 'lm-field') {
+    return { id: name, name, className, 'aria-invalid': Boolean(errors[name]), 'aria-describedby': `${name}-error` }
   }
 
-  function musicField(name: string) {
+  function musicField(name: string, className = 'lm-field') {
     return {
-      ...field(name),
-      className: fieldStyle + ' ' + focusOutline,
+      ...field(name, className),
       onChange: () => {
         if (errors[name]) setErrors((previous) => ({ ...previous, [name]: '' }))
       },
@@ -242,152 +239,191 @@ export default function CreateDayPage() {
   }
 
   function feedback(name: string) {
-    return <p id={`${name}-error`} aria-live="polite" className={errorStyle}>{errors[name]}</p>
+    return <p id={`${name}-error`} aria-live="polite" className="lm-error">{errors[name]}</p>
   }
 
   return (
-    <div className="space-y-6">
-      <h1 tabIndex={-1} className="text-3xl font-bold sm:text-4xl">Новый день</h1>
-      <form onSubmit={submit} noValidate aria-busy={pending}>
-        <fieldset disabled={pending} className="space-y-4">
-          <section className={panel}>
-            <label htmlFor="text" className="block text-lg font-semibold">Как прошёл день?</label>
-            <p id="text-hint" className="text-sm text-(color:--color-text-muted)">
-              Обязательное поле. До {maxDayTextLength} символов.
-            </p>
-            <textarea
-              {...field('text')}
-              required
-              rows={6}
-              className={fieldStyle + ' resize-y text-base focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-accent)'}
-              aria-describedby="text-hint text-error"
-              onChange={(event) => {
-                if (!errors.text) return
-                const message = validateDayText(normalizeTextarea(event.currentTarget.value))
-                if (message !== errors.text) {
-                  setErrors((previous) => ({ ...previous, text: message }))
-                }
-              }}
-            />
-            {feedback('text')}
-            <div className="max-w-56">
-              <label htmlFor="date" className="block text-sm">Дата (необязательно)</label>
-              <input {...field('date')} type="date" />
-              {feedback('date')}
-            </div>
-          </section>
-          <section className={panel} aria-labelledby="photos-heading">
-            <h2 id="photos-heading" className="text-lg font-semibold">Фотографии</h2>
-            <p id="photos-hint" className={mutedText}>1–{maxPhotos} фото JPEG, PNG или WebP, до {maxPhotoSizeMb} МБ каждое.</p>
-            <div className="flex flex-wrap items-center gap-3">
-              <input
-                {...field('photos')}
-                type="file"
-                multiple
-                accept={formats.join(',')}
-                className="peer sr-only"
-                aria-describedby="photos-hint photos-error"
-                onChange={(event) => {
-                  const selected = Array.from(event.currentTarget.files ?? [])
-                  event.currentTarget.value = ''
-                  if (!selected.length) return
-                  const message = validatePhotos([...photos.map(({ file }) => file), ...selected])
-                  setErrors((previous) => ({ ...previous, photos: message }))
-                  if (message) return
-                  const additions = selected.map((file) => ({ id: nextPhotoId.current++, file }))
-                  setPhotos((previous) => [...previous, ...additions])
-                }}
-              />
-              <label htmlFor="photos" className="cursor-pointer rounded border border-(--color-border) bg-(--color-background) px-3 py-2 text-sm font-semibold hover:bg-(--color-surface-hover) peer-aria-invalid:border-red-400 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-(--color-accent)">
-                Выбрать фотографии
-              </label>
-              <span role="status" className={mutedText}>Выбрано {photos.length} из {maxPhotos}</span>
-            </div>
-            {feedback('photos')}
-            {photos.length > 0 && (
-              <ul className="space-y-2">
-                {photos.map(({ id, file }) => (
-                  <PhotoPreview key={id} file={file} onRemove={() => {
-                    setPhotos((previous) => previous.filter((photo) => photo.id !== id))
-                    setErrors((previous) => ({ ...previous, photos: '' }))
-                  }} />
-                ))}
-              </ul>
-            )}
-          </section>
-          <section className={panel} aria-labelledby="music-heading">
-            <h2 id="music-heading" className="text-lg font-semibold">Музыка</h2>
-            <label htmlFor="music_url" className="block text-sm">Ссылка на песню</label>
-            <input {...musicField('music_url')} type="url" required placeholder="https://…" />
-            {feedback('music_url')}
-            <label htmlFor="music_description" className="block text-sm">Как звучит песня</label>
-            <p id="music-description-hint" className={mutedText}>Например: медленная, тихая, с пианино. До {maxMusicDescriptionLength} символов.</p>
-            <p className={mutedText}>Система оценит темп и настроение по этой фразе. Вы можете уточнить это ниже.</p>
-            <textarea {...musicField('music_description')} required rows={3}
-              className={fieldStyle + ' resize-y text-base ' + focusOutline} aria-describedby="music-description-hint music_description-error" />
-            {feedback('music_description')}
-            <details>
-              <summary id="music-refine" tabIndex={-1} className={'cursor-pointer rounded text-sm underline ' + focusOutline}>Уточнить, если хотите</summary>
-              <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                {musicTextFields.map(({ name, label }) => (
-                  <div key={name} className="min-w-0 space-y-1">
-                    <label htmlFor={name} className="block text-sm">{label}</label>
-                    <input {...musicField(name)} type="text" />
-                    {feedback(name)}
-                  </div>
-                ))}
-                {musicNumberFields.map(({ name, label, min, max, step }) => (
-                  <div key={name} className="min-w-0 space-y-1">
-                    <label htmlFor={name} className="block text-sm">{label}, {min}–{max}</label>
-                    <input {...musicField(name)} type="number" min={min} max={max} step={step} />
-                    {feedback(name)}
-                  </div>
-                ))}
-                <div className="min-w-0 space-y-1">
-                  <label htmlFor="music_genre" className="block text-sm">Жанр</label>
-                  <select {...musicField('music_genre')}>
-                    <option value="">Не указан</option>
-                    {genres.map((genre) => <option key={genre}>{genre}</option>)}
-                  </select>
-                  {feedback('music_genre')}
+    <div className="lm-create">
+      <form onSubmit={submit} noValidate aria-busy={pending} className="lm-form">
+        <fieldset disabled={pending} className="lm-fieldset">
+          <header className="lm-head">
+            <h1 tabIndex={-1} aria-label="Новый день" className="lm-title">
+              {'Новый день'.split('').map((letter, index) => (
+                <span key={index} aria-hidden="true" className="lm-letter" style={{ '--i': index } as CSSProperties}>
+                  {letter === ' ' ? ' ' : letter}
+                </span>
+              ))}
+            </h1>
+            <p className="lm-lede">Опишите день, добавьте фото и песню. Из этого соберётся открытка.</p>
+          </header>
+          <div className="lm-grid">
+            <div className="lm-col">
+              <section className="lm-block">
+                <label htmlFor="text" className="lm-label">Как прошёл день?</label>
+                <p id="text-hint" className="lm-hint">
+                  Обязательное поле. До {maxDayTextLength} символов.
+                </p>
+                <textarea
+                  {...field('text', 'lm-field lm-textarea')}
+                  required
+                  rows={6}
+                  aria-describedby="text-hint text-error"
+                  onChange={(event) => {
+                    if (!errors.text) return
+                    const message = validateDayText(normalizeTextarea(event.currentTarget.value))
+                    if (message !== errors.text) {
+                      setErrors((previous) => ({ ...previous, text: message }))
+                    }
+                  }}
+                />
+                {feedback('text')}
+                <div className="lm-date">
+                  <label htmlFor="date" className="lm-small">Дата (необязательно)</label>
+                  <input {...field('date')} type="date" />
+                  {feedback('date')}
                 </div>
-                <div className="min-w-0 space-y-1" role="group" aria-labelledby="music-tempo-label">
-                  <span id="music-tempo-label" className="block text-sm">Темп</span>
-                  <div className="flex flex-wrap gap-2">
-                    {tempoOptions.map(({ value, label }) => (
-                      <button key={value} type="button" aria-pressed={tempo === value}
-                        className={'rounded-(--radius-sm) border border-(--color-border) px-3 py-2 text-sm aria-pressed:border-(--color-accent) aria-pressed:font-semibold ' + focusOutline}
-                        onClick={() => { setTempo(tempo === value ? undefined : value); setErrors((p) => ({ ...p, music_tempo_bpm: '', music_energy: '' })) }}>
-                        {label}
-                      </button>
+              </section>
+
+              <section className="lm-block" aria-labelledby="photos-heading">
+                <h2 id="photos-heading" className="lm-label">Фотографии</h2>
+                <p id="photos-hint" className="lm-hint">1–{maxPhotos} фото JPEG, PNG или WebP, до {maxPhotoSizeMb} МБ каждое.</p>
+                <div className="lm-photo-actions">
+                  <input
+                    {...field('photos', 'lm-sr-only lm-file')}
+                    type="file"
+                    multiple
+                    accept={formats.join(',')}
+                    aria-describedby="photos-hint photos-error"
+                    onChange={(event) => {
+                      const selected = Array.from(event.currentTarget.files ?? [])
+                      event.currentTarget.value = ''
+                      if (!selected.length) return
+                      const message = validatePhotos([...photos.map(({ file }) => file), ...selected])
+                      setErrors((previous) => ({ ...previous, photos: message }))
+                      if (message) return
+                      const additions = selected.map((file) => ({ id: nextPhotoId.current++, file }))
+                      setPhotos((previous) => [...previous, ...additions])
+                    }}
+                  />
+                  <label htmlFor="photos" className="lm-pill">Выбрать</label>
+                  <span role="status" className="lm-hint">Выбрано {photos.length} из {maxPhotos}</span>
+                </div>
+                {feedback('photos')}
+                {photos.length > 0 && (
+                  <ul className="lm-photo-list">
+                    {photos.map(({ id, file }) => (
+                      <PhotoPreview key={id} file={file} onRemove={() => {
+                        setPhotos((previous) => previous.filter((photo) => photo.id !== id))
+                        setErrors((previous) => ({ ...previous, photos: '' }))
+                      }} />
                     ))}
-                  </div>
-                  {feedback('music_tempo_bpm')}
-                  {feedback('music_energy')}
-                </div>
-                <div className="min-w-0 space-y-1" role="group" aria-labelledby="music-mood-label">
-                  <span id="music-mood-label" className="block text-sm">Настроение</span>
-                  <div className="flex flex-wrap gap-2">
-                    {moodOptions.map(({ value, label }) => (
-                      <button key={value} type="button" aria-pressed={mood === value}
-                        className={'rounded-(--radius-sm) border border-(--color-border) px-3 py-2 text-sm aria-pressed:border-(--color-accent) aria-pressed:font-semibold ' + focusOutline}
-                        onClick={() => { setMood(mood === value ? undefined : value); setErrors((p) => ({ ...p, music_mode: '' })) }}>
-                        {label}
-                      </button>
+                  </ul>
+                )}
+              </section>
+            </div>
+
+            <div className="lm-col">
+              <section aria-labelledby="atmo-title" className="lm-block">
+                <h2 id="atmo-title" className="lm-label">Атмосфера дня</h2>
+                <div className="lm-atmo" data-tempo={tempoValue} data-mood={moodValue}>
+                  <svg className="lm-atmo-svg" viewBox="0 0 320 224" aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMid slice">
+                    {dropX.map((x, index) => (
+                      <line key={x} x1={x} x2={x} y1={0} y2={14} className="lm-drop" style={{ '--i': index } as CSSProperties} />
                     ))}
-                  </div>
-                  {feedback('music_mode')}
+                    <g className="lm-bud">
+                      <line x1={160} y1={136} x2={160} y2={200} className="lm-bud-line" />
+                      <path d="M160 136 C 146 120, 142 98, 160 74 C 178 98, 174 120, 160 136 Z" className="lm-bud-line lm-petals" />
+                      <path d="M160 136 C 150 134, 142 142, 140 152 M160 136 C 170 134, 178 142, 180 152" className="lm-bud-line" />
+                    </g>
+                  </svg>
+                  <p className="lm-atmo-caption">Дождь · вечер</p>
                 </div>
-              </div>
-            </details>
-          </section>
-          <p id="form-error" role="alert" tabIndex={-1} className={errorStyle}>{errors.form}</p>
-          <button type="submit" className="rounded-(--radius-sm) bg-(--color-accent) px-4 py-2.5 font-semibold text-(color:--color-background) disabled:opacity-60">
-            {pending ? 'Сохраняем день…' : errors.form ? 'Повторить отправку' : 'Создать открытку'}
-          </button>
+              </section>
+
+              <section aria-labelledby="music-heading" className="lm-block">
+                <h2 id="music-heading" className="lm-label">Музыка</h2>
+                <label htmlFor="music_url" className="lm-small">Ссылка на песню</label>
+                <input {...musicField('music_url')} type="url" required placeholder="https://…" />
+                {feedback('music_url')}
+                <label htmlFor="music_description" className="lm-small">Как звучит песня</label>
+                <p id="music-description-hint" className="lm-hint">Например: медленная, тихая, с пианино. До {maxMusicDescriptionLength} символов.</p>
+                <p className="lm-hint">Система оценит темп и настроение по этой фразе. Вы можете уточнить это ниже.</p>
+                <textarea
+                  {...musicField('music_description', 'lm-field lm-textarea')}
+                  required
+                  rows={3}
+                  aria-describedby="music-description-hint music_description-error"
+                />
+                {feedback('music_description')}
+                <details open className="lm-refine">
+                  <summary id="music-refine" tabIndex={-1} className="lm-summary">Уточнить, если хотите</summary>
+                  <div className="lm-refine-grid">
+                    {musicTextFields.map(({ name, label }) => (
+                      <div key={name} className="lm-line-field">
+                        <label htmlFor={name} className="lm-small">{label}</label>
+                        <div className="lm-line-wrap">
+                          <input {...musicField(name, 'lm-line-input')} type="text" />
+                          <span className="lm-line" aria-hidden="true" />
+                        </div>
+                        {feedback(name)}
+                      </div>
+                    ))}
+                    {musicNumberFields.map(({ name, label, min, max, step }) => (
+                      <div key={name} className="lm-line-field">
+                        <label htmlFor={name} className="lm-small">{label}, {min}–{max}</label>
+                        <div className="lm-line-wrap">
+                          <input {...musicField(name, 'lm-line-input')} type="number" min={min} max={max} step={step} />
+                          <span className="lm-line" aria-hidden="true" />
+                        </div>
+                        {feedback(name)}
+                      </div>
+                    ))}
+                    <div className="lm-line-field">
+                      <label htmlFor="music_genre" className="lm-small">Жанр</label>
+                      <select {...musicField('music_genre')}>
+                        <option value="">Не указан</option>
+                        {genres.map((genre) => <option key={genre}>{genre}</option>)}
+                      </select>
+                      {feedback('music_genre')}
+                    </div>
+                    <div className="lm-line-field" role="group" aria-labelledby="music-tempo-label">
+                      <span id="music-tempo-label" className="lm-small">Темп</span>
+                      <div className="lm-chips">
+                        {tempoOptions.map(({ value, label }) => (
+                          <button key={value} type="button" aria-pressed={tempoValue === value} className="lm-chip"
+                            onClick={() => { setTempo(tempo === value ? undefined : value); setErrors((p) => ({ ...p, music_tempo_bpm: '', music_energy: '' })) }}>
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                      {feedback('music_tempo_bpm')}
+                      {feedback('music_energy')}
+                    </div>
+                    <div className="lm-line-field" role="group" aria-labelledby="music-mood-label">
+                      <span id="music-mood-label" className="lm-small">Настроение</span>
+                      <div className="lm-chips">
+                        {moodOptions.map(({ value, label }) => (
+                          <button key={value} type="button" aria-pressed={moodValue === value} className="lm-chip"
+                            onClick={() => { setMood(mood === value ? undefined : value); setErrors((p) => ({ ...p, music_mode: '' })) }}>
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                      {feedback('music_mode')}
+                    </div>
+                  </div>
+                </details>
+              </section>
+
+              <p id="form-error" role="alert" tabIndex={-1} className="lm-error">{errors.form}</p>
+              <button type="submit" className="lm-primary">
+                {pending ? 'Сохраняем день…' : errors.form ? 'Повторить отправку' : 'Создать открытку'}
+              </button>
+            </div>
+          </div>
         </fieldset>
       </form>
-      <p role="status" className="sr-only">{pending ? 'Сохраняем день…' : ''}</p>
+      <p role="status" className="lm-sr-only">{pending ? 'Сохраняем день…' : ''}</p>
     </div>
   )
 }
