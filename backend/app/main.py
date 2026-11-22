@@ -3,11 +3,12 @@ from __future__ import annotations
 
 import logging
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, Response
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .config import Settings, load_settings
@@ -17,8 +18,47 @@ from .storage import Storage
 
 logger = logging.getLogger("lumen")
 
+# backend/app/main.py -> корень репозитория -> frontend/dist (не зависит от текущей папки).
+FRONTEND_DIST = Path(__file__).resolve().parents[2] / "frontend" / "dist"
+# Первый сегмент пути, который относится к API и никогда не отдаётся как index.html.
+API_SEGMENTS = frozenset({"api", "media", "health", "docs", "openapi.json"})
 
-def create_app(settings: Settings | None = None) -> FastAPI:
+
+def _is_api_path(path: str) -> bool:
+    return path.lstrip("/").split("/", 1)[0] in API_SEGMENTS
+
+
+def _mount_frontend(app: FastAPI, dist: Path) -> None:
+    """Раздача собранного фронтенда и SPA fallback. Вызывать после подключения API-роутов."""
+    dist_root = dist.resolve()
+    index_file = dist_root / "index.html"
+    built = index_file.is_file()
+
+    @app.get("/{full_path:path}", include_in_schema=False)
+    def frontend(full_path: str) -> Response:
+        if _is_api_path(full_path):
+            raise ApiError(404, "not_found")
+        if not built:
+            if full_path == "":
+                return JSONResponse({
+                    "status": "ok",
+                    "frontend": "not_built",
+                    "message": "Фронтенд не собран. Выполните: cd frontend; npm ci; npm run build",
+                    "api_docs": "/docs",
+                })
+            raise ApiError(404, "not_found")
+        try:
+            candidate = (dist_root / full_path).resolve()
+        except (OSError, ValueError):
+            raise ApiError(404, "not_found") from None
+        if not candidate.is_relative_to(dist_root):  # path traversal: не отдаём ничего вне dist
+            raise ApiError(404, "not_found")
+        if candidate.is_file():
+            return FileResponse(candidate)
+        return FileResponse(index_file)  # SPA fallback: /archive, /memory/<id> и т.п.
+
+
+def create_app(settings: Settings | None = None, frontend_dist: Path | None = None) -> FastAPI:
     settings = settings or load_settings()
     storage = Storage(settings.data_dir)  # папки и БД создаются при первом обращении
 
@@ -66,6 +106,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     app.include_router(days_router, prefix="/api")
     app.include_router(media_router)
+    _mount_frontend(app, frontend_dist or FRONTEND_DIST)  # последним: ловит всё, что не API
     return app
 
 
