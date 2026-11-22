@@ -273,4 +273,4 @@ def test_chosen_weather_overrides_text_weather():
     assert visual["motion"]["scene"] == "rain" and visual["texture"]["weather"] == "rain"
     tex = next(e for e in explain if e["param"] == "texture.weather")
     assert tex["source"] == "context.weather" and tex["provenance"] == "entered"
-    assert "отмечен в записи" in tex["text_ru"]
+    assert "по выбору в записи" in tex["text_ru"]

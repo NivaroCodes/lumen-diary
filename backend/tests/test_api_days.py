@@ -93,7 +93,8 @@ def test_archive_lists_three_days_newest_first(client, three_days):
     assert dates == sorted(dates, reverse=True)
     assert {i["id"] for i in items} == {d["id"] for d in three_days.values()}
     for item in items:
-        assert set(item) == {"id", "title", "date", "preview_url"}
+        assert set(item) == {"id", "title", "date", "preview_url", "folder", "place", "photos", "visual"}
+        assert item["visual"]["caption"] == item["title"]
         assert client.get(item["preview_url"]).status_code == 200
 
 

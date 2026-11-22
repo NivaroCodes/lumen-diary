@@ -134,7 +134,7 @@ def build_visual(profile: dict[str, Any], seed: int, caption: str) -> tuple[dict
     weather = chosen_weather or text.get("weather", "none")
     weather_source = "context.weather" if chosen_weather else "text.weather"
     weather_prov = "entered" if chosen_weather else _prov(weather, "measured")
-    where = "отмечен в записи" if chosen_weather else "в тексте"
+    where = "по выбору в записи" if chosen_weather else "по тексту"
     tex_weather = weather if weather in ("rain", "fog") else "none"
     add("texture.weather", tex_weather, "R-TEX-01", weather_source, weather,
         {"rain": f"Дождь ({where}) добавляет вертикальную фактуру.",

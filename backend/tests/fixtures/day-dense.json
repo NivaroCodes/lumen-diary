@@ -131,7 +131,7 @@
       "rule": "R-TEX-01",
       "source": "text.weather",
       "input": "fog",
-      "text_ru": "Туман (в тексте) добавляет дымку.",
+      "text_ru": "Туман (по тексту) добавляет дымку.",
       "provenance": "measured"
     },
     {
@@ -221,7 +221,7 @@
       "rule": "R-MOT-04",
       "source": "text.weather",
       "input": "fog",
-      "text_ru": "Туман (в тексте) — дымка медленно расплывается.",
+      "text_ru": "Туман (по тексту) — дымка медленно расплывается.",
       "provenance": "measured"
     },
     {

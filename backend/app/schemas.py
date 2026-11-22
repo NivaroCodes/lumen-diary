@@ -39,6 +39,11 @@ class DaySummary(BaseModel):
     title: str
     date: str
     preview_url: str | None
+    # Для мини-открыток в архиве (необязательные, добавлены без изменения прежних полей).
+    folder: str | None = None
+    place: str | None = None
+    photos: list[str] = []
+    visual: dict[str, Any] | None = None
 
 
 class DayRecord(BaseModel):

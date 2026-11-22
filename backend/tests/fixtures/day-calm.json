@@ -131,7 +131,7 @@
       "rule": "R-TEX-01",
       "source": "text.weather",
       "input": "rain",
-      "text_ru": "Дождь (в тексте) добавляет вертикальную фактуру.",
+      "text_ru": "Дождь (по тексту) добавляет вертикальную фактуру.",
       "provenance": "measured"
     },
     {
@@ -221,7 +221,7 @@
       "rule": "R-MOT-04",
       "source": "text.weather",
       "input": "rain",
-      "text_ru": "Дождь (в тексте) — капли падают в ритме пульса.",
+      "text_ru": "Дождь (по тексту) — капли падают в ритме пульса.",
       "provenance": "measured"
     },
     {
