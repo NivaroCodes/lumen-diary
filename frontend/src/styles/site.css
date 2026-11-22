@@ -1,0 +1,149 @@
+/* Каркас сайта, сетка 12 колонок, страницы «Открытка» и «Архив». */
+
+.site { display: flex; flex-direction: column; min-height: 100vh; }
+
+.skip-link {
+  position: absolute; left: 16px; top: -48px; z-index: 50;
+  padding: 10px 16px; border-radius: 999px;
+  background: var(--color-text); color: var(--color-surface); font-weight: 600;
+}
+.skip-link:focus { top: 12px; }
+
+.site-bar {
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+  gap: 8px 24px; width: 100%; max-width: var(--grid-max); margin-inline: auto;
+  padding: 20px var(--grid-pad); box-sizing: border-box;
+}
+.site-mark {
+  font: 500 30px/1 var(--font-serif); color: var(--color-text); text-decoration: none;
+  border-radius: 4px;
+}
+.site-nav { display: flex; gap: 24px; font-size: 15px; font-weight: 600; }
+.site-nav a {
+  position: relative; padding: 6px 0; color: var(--color-text-muted); text-decoration: none; border-radius: 2px;
+}
+.site-nav a::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1.5px;
+  background: currentColor; transform: scaleX(0); transform-origin: left;
+  transition: transform 420ms cubic-bezier(.22, 1, .36, 1);
+}
+.site-nav a:hover::after, .site-nav a[aria-current="page"]::after { transform: scaleX(1); }
+.site-nav a[aria-current="page"] { color: var(--color-text); }
+
+.site :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+
+.site-main {
+  flex: 1; width: 100%; max-width: var(--grid-max); margin-inline: auto;
+  padding: 8px var(--grid-pad) 64px; box-sizing: border-box;
+}
+.site-footer { border-top: 1px solid var(--color-border); color: var(--color-text-muted); font-size: 14px; }
+.site-footer p { margin: 0; }
+
+/* Сетка 12 колонок */
+.grid12 {
+  display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--grid-gap);
+}
+.grid12 > * { grid-column: 1 / -1; min-width: 0; }
+
+/* Общие элементы */
+.page-title {
+  margin: 0; font: 500 clamp(44px, 7vw, 84px)/1 var(--font-serif); letter-spacing: -.01em;
+  text-wrap: balance;
+}
+.page-title:focus { outline: none; }
+.page-lede { margin: 16px 0 0; max-width: 46ch; color: var(--color-text-muted); font-size: 17px; line-height: 1.5; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  border: 1px solid #8C8376; border-radius: 999px; padding: 12px 22px;
+  background: transparent; color: var(--color-text); font: 700 15px/1 var(--font-sans); text-decoration: none;
+  transition: background-color 200ms ease, color 200ms ease, transform 200ms ease;
+}
+.btn:hover { background: var(--color-text); color: var(--color-surface); }
+.btn:active { transform: scale(.97); }
+.btn[aria-pressed="true"] { background: var(--color-text); color: var(--color-surface); border-color: var(--color-text); }
+.btn-solid { background: var(--color-text); color: var(--color-surface); border-color: var(--color-text); }
+.btn-solid:hover { background: var(--color-accent); border-color: var(--color-accent); }
+.btn svg { width: 18px; height: 18px; }
+
+.text-link { color: var(--color-accent); font-weight: 600; text-decoration: underline; text-underline-offset: 4px; border-radius: 2px; }
+.status-line { color: var(--color-text-muted); }
+.error-line { margin: 0; color: var(--color-error); }
+
+/* Буквы заголовка проявляются по одной; задержки считаются из темпа (postcard-motion.ts). */
+.letter { display: inline-block; white-space: pre; animation: letter-in var(--letter-ms, 700ms) cubic-bezier(.22, 1, .36, 1) both; animation-delay: var(--letter-delay, 0ms); }
+@keyframes letter-in {
+  from { opacity: 0; filter: blur(6px); transform: translateY(.18em); }
+  to { opacity: 1; filter: blur(0); transform: none; }
+}
+
+/* ---------- Открытка дня ---------- */
+.memory { row-gap: 40px; padding-top: 24px; }
+.memory-card { position: relative; }
+@media (min-width: 960px) {
+  .memory-card { grid-column: 1 / span 6; position: sticky; top: 24px; align-self: start; }
+  .memory-side { grid-column: 7 / span 6; }
+}
+.memory-side { display: flex; flex-direction: column; gap: 40px; }
+.memory-head .page-title { font-size: clamp(40px, 5.4vw, 68px); }
+.memory-facts { display: grid; grid-template-columns: max-content 1fr; gap: 6px 20px; margin: 24px 0 0; font-size: 15px; }
+.memory-facts dt { color: var(--color-text-muted); }
+.memory-facts dd { margin: 0; overflow-wrap: anywhere; }
+.memory-facts .folder { font-weight: 600; }
+.memory-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+
+.section-title { margin: 0 0 16px; font: 500 34px/1.1 var(--font-serif); }
+.music-desc { margin: 0 0 12px; font: italic 500 22px/1.35 var(--font-serif); }
+.music-meta { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; padding: 0; list-style: none; }
+.music-meta li { border: 1px solid var(--color-border); border-radius: 999px; padding: 6px 12px; font-size: 14px; }
+.music-meta li[data-unknown="true"] { border-style: dashed; color: var(--color-text-muted); }
+.player { display: block; width: 100%; border: 0; border-radius: 14px; background: var(--color-surface-hover); }
+.player-video { aspect-ratio: 16 / 9; height: auto; }
+
+/* «Почему так» */
+.why-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+.why-list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; }
+.why-item {
+  display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; padding: 14px 0;
+  border-top: 1px solid var(--color-border);
+}
+.why-item:last-child { border-bottom: 1px solid var(--color-border); }
+.why-text { margin: 0; font-size: 16px; line-height: 1.5; }
+.why-rule { font-size: 13px; color: var(--color-text-muted); white-space: nowrap; }
+.why-meta { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--color-text-muted); }
+.why-meta b { font-weight: 600; color: var(--color-text); }
+.why-source[data-prov="unknown"] { font-style: italic; }
+.why-note { margin: 12px 0 0; font-size: 14px; color: var(--color-text-muted); }
+
+/* ---------- Архив ---------- */
+.archive-head { padding: 24px 0 40px; }
+.archive-month { margin: 0 0 20px; font: 500 30px/1 var(--font-serif); text-transform: lowercase; }
+.archive-month::first-letter { text-transform: uppercase; }
+.archive-group { margin-bottom: 56px; }
+.archive-wall { row-gap: 40px; margin: 0; padding: 0; list-style: none; }
+.archive-wall > li { grid-column: span 12; }
+@media (min-width: 640px) { .archive-wall > li { grid-column: span 6; } }
+@media (min-width: 1024px) { .archive-wall > li { grid-column: span 4; } }
+.archive-item { display: block; color: inherit; text-decoration: none; border-radius: 6px; }
+.archive-print { transition: transform 420ms cubic-bezier(.22, 1, .36, 1), box-shadow 420ms cubic-bezier(.22, 1, .36, 1); box-shadow: var(--rest-shadow); }
+.archive-item:hover .archive-print, .archive-item:focus-visible .archive-print {
+  transform: translateY(-6px) rotate(var(--tilt, 0deg)); box-shadow: var(--lift-shadow);
+}
+.archive-caption { display: flex; justify-content: space-between; gap: 12px; margin-top: 14px; }
+.archive-title { margin: 0; font: 500 24px/1.15 var(--font-serif); overflow-wrap: anywhere; }
+.archive-date { flex-shrink: 0; color: var(--color-text-muted); font-size: 14px; padding-top: 4px; }
+.archive-folder { margin: 4px 0 0; color: var(--color-text-muted); font-size: 13px; overflow-wrap: anywhere; }
+.archive-empty { grid-column: 1 / -1; padding: 64px 0; display: flex; flex-direction: column; align-items: flex-start; gap: 20px; }
+.archive-empty h2 { margin: 0; font: 500 40px/1.1 var(--font-serif); }
+.archive-empty p { margin: 0; color: var(--color-text-muted); max-width: 46ch; }
+.skeleton { aspect-ratio: 4 / 5; background: var(--color-surface-hover); animation: develop-wait 1600ms ease-in-out infinite alternate; }
+@keyframes develop-wait { from { opacity: .45; } to { opacity: 1; } }
+
+/* Переход открытки из архива в открытку дня (View Transitions). */
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 320ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .site *, .site *::before, .site *::after { animation: none !important; transition: none !important; }
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}
+.word { display: inline-block; white-space: nowrap; }

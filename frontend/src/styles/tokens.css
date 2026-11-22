@@ -1,17 +1,27 @@
+/* Палитра и шрифты всего сайта. Совпадают с экраном создания дня (create-day.css). */
 :root {
-    --color-background: #101010;
-    --color-surface: #1a1a1a;
-    --color-surface-hover: #242424;
-    --color-text: #f5f2eb;
-    --color-text-muted: #a3a3a3;
-    --color-accent: #d4b483;
-    --color-border: #303030;
+    --color-background: #EFEDE6;
+    --color-surface: #F7F5EF;
+    --color-surface-hover: #E6E2D8;
+    --color-text: #24201B;
+    --color-text-muted: #635B52;
+    --color-accent: #2F4A5E;
+    --color-border: #CFC8BA;
+    --color-error: #9B2C2C;
 
-    --font-sans: Arial, sans-serif;
-    --font-serif: Georgia, serif;
-    --font-mono: monospace;
+    --font-sans: 'Manrope', system-ui, sans-serif;
+    --font-serif: 'Cormorant Garamond', Georgia, serif;
+    --font-mono: ui-monospace, monospace;
 
     --radius-sm: 6px;
     --radius-md: 12px;
     --radius-lg: 20px;
+
+    /* Сетка 12 колонок: поля 16/32/48 px, зазор 24 px, ширина до 1200 px. */
+    --grid-max: 1200px;
+    --grid-gap: 24px;
+    --grid-pad: 16px;
 }
+
+@media (min-width: 640px) { :root { --grid-pad: 32px; } }
+@media (min-width: 1024px) { :root { --grid-pad: 48px; } }

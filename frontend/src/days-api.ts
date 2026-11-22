@@ -36,6 +36,10 @@ export interface DaySummary {
   title: string
   date: string
   preview_url: string | null
+  folder?: string | null
+  place?: string | null
+  photos?: string[]
+  visual?: VisualModel | null
 }
 
 export interface MusicRecord {
@@ -46,24 +50,38 @@ export interface MusicRecord {
   artist?: string | null
   genre?: string | null
   tempo_bpm?: number | null
+  energy?: number | null
+  mode?: 'major' | 'minor' | 'unknown'
+  year?: number | null
 }
 
 export interface ExplainItem {
   param: string
   value?: unknown
   text_ru: string
+  rule?: string
+  source?: string
+  input?: unknown
+  provenance?: 'measured' | 'entered' | 'unknown' | string
+}
+
+export interface DayContext {
+  weather?: 'rain' | 'fog' | 'cloud' | 'sun' | null
+  weather_source?: 'chosen' | 'text'
+  place?: string | null
 }
 
 export interface DayRecord {
   id: string
   title: string
   date: string
+  folder?: string | null
   text: string
   photos: string[]
   music: MusicRecord
   visual: VisualModel
   explain: ExplainItem[]
-  profile: Record<string, unknown>
+  profile: Record<string, unknown> & { context?: DayContext }
 }
 
 const requestTimeoutMs = 10_000
@@ -168,5 +186,29 @@ export function normalizeMusicUrl(url: string): string {
     return match ? `https://open.spotify.com/track/${match[1]}` : url
   } catch {
     return url
+  }
+}
+
+export type MusicEmbed = { kind: 'spotify' | 'youtube'; src: string; title: string }
+
+// Встраиваемый плеер по ссылке: трек Spotify или видео YouTube (без cookie). Другие ссылки — без плеера.
+export function musicEmbed(url: string | undefined): MusicEmbed | null {
+  try {
+    const parsed = new URL(url ?? '')
+    const host = parsed.hostname.replace(/^www\./, '').replace(/^m\./, '')
+    if (host === 'open.spotify.com') {
+      const match = /^(?:\/intl-[a-z]{2})?\/track\/([A-Za-z0-9]+)\/?$/.exec(parsed.pathname)
+      return match ? { kind: 'spotify', src: `https://open.spotify.com/embed/track/${match[1]}`, title: 'Проигрыватель Spotify' } : null
+    }
+    let id: string | null = null
+    if (host === 'youtu.be') id = parsed.pathname.slice(1).split('/')[0]
+    if (host === 'youtube.com' || host === 'music.youtube.com') {
+      id = parsed.searchParams.get('v') ?? /^\/(?:shorts|embed)\/([\w-]+)/.exec(parsed.pathname)?.[1] ?? null
+    }
+    return id && /^[\w-]{6,20}$/.test(id)
+      ? { kind: 'youtube', src: `https://www.youtube-nocookie.com/embed/${id}`, title: 'Проигрыватель YouTube' }
+      : null
+  } catch {
+    return null
   }
 }
