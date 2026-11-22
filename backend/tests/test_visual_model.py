@@ -49,13 +49,14 @@ def test_every_visual_param_has_explain():
         "light.direction_deg", "light.intensity", "light.temperature_k", "palette.colors",
         "palette.saturation", "density.value", "density.elements", "texture.weather",
         "texture.grain", "texture.blur", "line.trajectory", "line.amplitude",
-        "line.roughness", "line.color_index", "motion.reveal_ms", "motion.pulse_ms", "contrast",
+        "line.roughness", "line.color_index", "motion.reveal_ms", "motion.pulse_ms",
+        "motion.character", "motion.scene", "contrast",
     }
     assert params == expected
     assert {e["rule"] for e in explain} == {
         "R-LIGHT-01", "R-LIGHT-02", "R-LIGHT-03", "R-PAL-01", "R-PAL-02", "R-DEN-01", "R-DEN-02",
         "R-TEX-01", "R-TEX-02", "R-TEX-03", "R-LINE-01", "R-LINE-02", "R-LINE-03", "R-LINE-04",
-        "R-MOT-01", "R-MOT-02", "R-CON-01",
+        "R-MOT-01", "R-MOT-02", "R-MOT-03", "R-MOT-04", "R-CON-01",
     }
 
 
@@ -125,8 +126,9 @@ def test_text_changes_only_text_params():
                          text__length_words=250), 1, "c")
     assert _changed(base, other) <= {
         "light.direction_deg", "density.value", "density.elements", "texture.weather", "line.trajectory",
+        "motion.scene",  # R-MOT-04: погода из текста задаёт сцену
     }
-    assert len(_changed(base, other)) == 5
+    assert len(_changed(base, other)) == 6
 
 
 @pytest.mark.parametrize("tod,direction,traj", [
@@ -233,3 +235,42 @@ def test_r_con_01_clamped():
     assert 0.0 <= v["contrast"] <= 1.0
     v, _ = build_visual(_profile_variant(photos__contrast=1.0, music__mode="minor"), 1, "c")
     assert v["contrast"] == 0.8
+
+
+@pytest.mark.parametrize("mode,character,prov", [
+    ("major", "smooth", "entered"), ("minor", "sharp", "entered"), ("unknown", "neutral", "unknown"),
+])
+def test_r_mot_03_character_from_mode(mode, character, prov):
+    visual, explain = build_visual(_profile_variant(music__mode=mode), 1, "c")
+    assert visual["motion"]["character"] == character
+    item = next(e for e in explain if e["param"] == "motion.character")
+    assert item["rule"] == "R-MOT-03" and item["provenance"] == prov
+    if mode == "unknown":
+        assert "неизвестен" in item["text_ru"]
+
+
+def test_mode_changes_only_character_and_contrast():
+    base, _ = build_visual(_profile_variant(music__mode="minor"), 1, "c")
+    other, _ = build_visual(_profile_variant(music__mode="major"), 1, "c")
+    assert _changed(base, other) == {"motion.character", "contrast"}
+
+
+@pytest.mark.parametrize("weather,scene,texture", [
+    ("rain", "rain", "rain"), ("fog", "fog", "fog"), ("sun", "sun", "none"),
+    ("cloud", "cloud", "none"), ("snow", "snow", "none"), ("none", "still", "none"),
+])
+def test_r_mot_04_scene_from_text_weather(weather, scene, texture):
+    visual, explain = build_visual(_profile_variant(text__weather=weather), 1, "c")
+    assert visual["motion"]["scene"] == scene
+    assert visual["texture"]["weather"] == texture
+    assert next(e for e in explain if e["param"] == "motion.scene")["rule"] == "R-MOT-04"
+
+
+def test_chosen_weather_overrides_text_weather():
+    profile = _profile_variant(text__weather="sun")
+    profile["context"] = {"weather": "rain", "weather_source": "chosen", "place": None}
+    visual, explain = build_visual(profile, 1, "c")
+    assert visual["motion"]["scene"] == "rain" and visual["texture"]["weather"] == "rain"
+    tex = next(e for e in explain if e["param"] == "texture.weather")
+    assert tex["source"] == "context.weather" and tex["provenance"] == "entered"
+    assert "отмечен в записи" in tex["text_ru"]

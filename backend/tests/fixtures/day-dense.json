@@ -46,7 +46,9 @@
     },
     "motion": {
       "reveal_ms": 2500,
-      "pulse_ms": 600
+      "pulse_ms": 600,
+      "character": "neutral",
+      "scene": "fog"
     },
     "contrast": 0.45,
     "caption": "День, совещания и туман"
@@ -129,7 +131,7 @@
       "rule": "R-TEX-01",
       "source": "text.weather",
       "input": "fog",
-      "text_ru": "Туман в тексте добавляет дымку.",
+      "text_ru": "Туман (в тексте) добавляет дымку.",
       "provenance": "measured"
     },
     {
@@ -205,6 +207,24 @@
       "provenance": "entered"
     },
     {
+      "param": "motion.character",
+      "value": "neutral",
+      "rule": "R-MOT-03",
+      "source": "music.mode",
+      "input": "unknown",
+      "text_ru": "Лад неизвестен — движение нейтральное, без плавности мажора и пауз минора.",
+      "provenance": "unknown"
+    },
+    {
+      "param": "motion.scene",
+      "value": "fog",
+      "rule": "R-MOT-04",
+      "source": "text.weather",
+      "input": "fog",
+      "text_ru": "Туман (в тексте) — дымка медленно расплывается.",
+      "provenance": "measured"
+    },
+    {
       "param": "contrast",
       "value": 0.45,
       "rule": "R-CON-01",
@@ -252,6 +272,11 @@
       "energy": 0.55,
       "mode": "unknown",
       "provenance": "entered"
+    },
+    "context": {
+      "weather": null,
+      "weather_source": "text",
+      "place": null
     }
   }
 }

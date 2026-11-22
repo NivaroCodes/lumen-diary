@@ -17,6 +17,10 @@ DEFAULT_PALETTE = ["#D9D2C5", "#8A8F98", "#2F3440"]
 DIRECTION = {"morning": 90, "day": 180, "evening": 270, "night": 0}
 TRAJECTORY = {"morning": "rising", "day": "wave", "evening": "falling", "night": "flat"}
 ROUGH_GENRES = {"rock", "electronic"}
+# R-MOT-03: лад задаёт характер движения. R-MOT-04: погода задаёт тип фоновой сцены.
+CHARACTER = {"major": "smooth", "minor": "sharp"}
+SCENES = {"rain", "fog", "snow", "sun", "cloud"}
+WEATHER_RU = {"rain": "Дождь", "fog": "Туман", "snow": "Снег", "sun": "Солнце", "cloud": "Облачность"}
 
 
 def _round2(x: float) -> float:
@@ -125,12 +129,18 @@ def build_visual(profile: dict[str, Any], seed: int, caption: str) -> tuple[dict
         else "Мало элементов — больше пустого пространства.", "measured")
 
     # --- фактура ---
-    weather = text.get("weather", "none")
+    context = profile.get("context") or {}
+    chosen_weather = context.get("weather")
+    weather = chosen_weather or text.get("weather", "none")
+    weather_source = "context.weather" if chosen_weather else "text.weather"
+    weather_prov = "entered" if chosen_weather else _prov(weather, "measured")
+    where = "отмечен в записи" if chosen_weather else "в тексте"
     tex_weather = weather if weather in ("rain", "fog") else "none"
-    add("texture.weather", tex_weather, "R-TEX-01", "text.weather", weather,
-        {"rain": "Дождь в тексте добавляет вертикальную фактуру.",
-         "fog": "Туман в тексте добавляет дымку."}.get(tex_weather, "Заметной погоды в тексте нет, фактура без осадков."),
-        _prov(weather, "measured"))
+    add("texture.weather", tex_weather, "R-TEX-01", weather_source, weather,
+        {"rain": f"Дождь ({where}) добавляет вертикальную фактуру.",
+         "fog": f"Туман ({where}) добавляет дымку."}.get(
+            tex_weather, "Осадков и тумана нет, фактура без штриховки."),
+        weather_prov)
 
     grain = _round2(0.5 * (1 - brightness))
     add("texture.grain", grain, "R-TEX-02", "photos.brightness", brightness,
@@ -191,8 +201,28 @@ def build_visual(profile: dict[str, Any], seed: int, caption: str) -> tuple[dict
         "Темп не указан, пульс обычный." if tempo is None
         else "Пульс движения соответствует темпу песни.", _prov(tempo, music_prov))
 
-    # --- контраст ---
     mode = music.get("mode", "unknown")
+    character = CHARACTER.get(mode, "neutral")
+    add("motion.character", character, "R-MOT-03", "music.mode", mode,
+        {"smooth": "Мажорный лад (оценён по описанию или выбран) — движение плавное и непрерывное.",
+         "sharp": "Минорный лад (оценён по описанию или выбран) — движение резче, с паузами между волнами."}.get(
+            character, "Лад неизвестен — движение нейтральное, без плавности мажора и пауз минора."),
+        music_prov if character != "neutral" else "unknown")
+
+    scene = weather if weather in SCENES else "still"
+    scene_text = {
+        "rain": "капли падают в ритме пульса",
+        "fog": "дымка медленно расплывается",
+        "snow": "снег медленно опускается",
+        "sun": "пятно света мягко смещается",
+        "cloud": "облака медленно проходят по кадру",
+    }
+    add("motion.scene", scene, "R-MOT-04", weather_source, weather,
+        f"{WEATHER_RU[scene]} ({where}) — {scene_text[scene]}." if scene != "still"
+        else "Погоды нет ни в тексте, ни в выборе — сцена неподвижна, двигаются только свет и линия.",
+        weather_prov if scene != "still" else "unknown")
+
+    # --- контраст ---
     contrast = 0.3 + 0.4 * p_contrast + (0.1 if mode == "minor" else -0.05 if mode == "major" else 0.0)
     contrast = _round2(_clamp(contrast, 0.0, 1.0))
     add("contrast", contrast, "R-CON-01", "music.mode", mode,
@@ -209,7 +239,7 @@ def build_visual(profile: dict[str, Any], seed: int, caption: str) -> tuple[dict
         "density": {"value": density, "elements": elements},
         "texture": {"grain": grain, "blur": blur, "weather": tex_weather},
         "line": {"trajectory": trajectory, "amplitude": amplitude, "roughness": roughness, "color_index": 0},
-        "motion": {"reveal_ms": reveal, "pulse_ms": pulse},
+        "motion": {"reveal_ms": reveal, "pulse_ms": pulse, "character": character, "scene": scene},
         "contrast": contrast,
         "caption": caption,
     }

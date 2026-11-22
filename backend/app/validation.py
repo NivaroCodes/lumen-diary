@@ -26,6 +26,8 @@ MAX_GENRE = 40
 MIN_YEAR = 1900
 GENRES = {"ambient", "pop", "rock", "electronic", "jazz", "classical", "hip-hop", "folk", "other", "unknown"}
 MODES = {"major", "minor", "unknown"}
+WEATHER_CHOICES = {"rain", "fog", "cloud", "sun"}
+MAX_PLACE = 80
 
 
 @dataclass(frozen=True)
@@ -203,6 +205,21 @@ def validate_date(raw: str | None) -> str:
         raise validation_error("date", "Дата должна быть в формате YYYY-MM-DD") from None
 
 
+def validate_context(form: Mapping[str, Any]) -> tuple[str | None, str | None]:
+    """Необязательные weather (rain|fog|cloud|sun) и place (до 80 символов). Ничего не запрашиваем извне."""
+    weather = _optional(form, "weather")
+    if weather is not None:
+        weather = weather.lower()
+        if weather not in WEATHER_CHOICES:
+            raise validation_error("weather", "Погода: rain, fog, cloud или sun")
+    place = _optional(form, "place")
+    if place is not None:
+        place = " ".join(place.split())
+        if len(place) > MAX_PLACE:
+            raise validation_error("place", f"Место — до {MAX_PLACE} символов")
+    return weather, place
+
+
 def validate_day_form(
     form: Mapping[str, Any], photos: list[PhotoBlob], settings: Settings
 ) -> DayInput:
@@ -211,4 +228,5 @@ def validate_day_form(
     validate_photos(photos, settings)
     music = validate_music(form)
     day_date = validate_date(_field(form, "date"))
-    return DayInput(text=text, date=day_date, music=music)
+    weather, place = validate_context(form)
+    return DayInput(text=text, date=day_date, music=music, weather=weather, place=place)

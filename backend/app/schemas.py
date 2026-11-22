@@ -30,6 +30,8 @@ class DayInput(BaseModel):
     text: str = Field(min_length=1, max_length=5000)
     date: str  # YYYY-MM-DD
     music: MusicInput
+    weather: Literal["rain", "fog", "cloud", "sun"] | None = None  # выбор пользователя, без внешних API
+    place: str | None = Field(default=None, max_length=80)  # место вручную, без геолокации
 
 
 class DaySummary(BaseModel):

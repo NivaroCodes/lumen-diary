@@ -46,7 +46,9 @@
     },
     "motion": {
       "reveal_ms": 2980,
-      "pulse_ms": 882
+      "pulse_ms": 882,
+      "character": "sharp",
+      "scene": "rain"
     },
     "contrast": 0.6,
     "caption": "Вечер, комнате и дождь"
@@ -129,7 +131,7 @@
       "rule": "R-TEX-01",
       "source": "text.weather",
       "input": "rain",
-      "text_ru": "Дождь в тексте добавляет вертикальную фактуру.",
+      "text_ru": "Дождь (в тексте) добавляет вертикальную фактуру.",
       "provenance": "measured"
     },
     {
@@ -205,6 +207,24 @@
       "provenance": "entered"
     },
     {
+      "param": "motion.character",
+      "value": "sharp",
+      "rule": "R-MOT-03",
+      "source": "music.mode",
+      "input": "minor",
+      "text_ru": "Минорный лад (оценён по описанию или выбран) — движение резче, с паузами между волнами.",
+      "provenance": "entered"
+    },
+    {
+      "param": "motion.scene",
+      "value": "rain",
+      "rule": "R-MOT-04",
+      "source": "text.weather",
+      "input": "rain",
+      "text_ru": "Дождь (в тексте) — капли падают в ритме пульса.",
+      "provenance": "measured"
+    },
+    {
       "param": "contrast",
       "value": 0.6,
       "rule": "R-CON-01",
@@ -252,6 +272,11 @@
       "energy": 0.25,
       "mode": "minor",
       "provenance": "entered"
+    },
+    "context": {
+      "weather": null,
+      "weather_source": "text",
+      "place": null
     }
   }
 }

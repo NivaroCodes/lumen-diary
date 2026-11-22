@@ -42,6 +42,10 @@ _CREATE_OPENAPI = {
                         "music_tempo_bpm": {"type": "number", "minimum": 40, "maximum": 220},
                         "music_energy": {"type": "number", "minimum": 0, "maximum": 1},
                         "music_mode": {"type": "string", "enum": ["major", "minor", "unknown"]},
+                        "weather": {"type": "string", "enum": ["rain", "fog", "cloud", "sun"],
+                                    "description": "Необязательно. Погода, выбранная вручную; важнее погоды из текста."},
+                        "place": {"type": "string", "maxLength": 80,
+                                  "description": "Необязательно. Место, введённое вручную."},
                         "date": {"type": "string", "format": "date",
                                  "description": "Необязательно, YYYY-MM-DD. По умолчанию сегодня."},
                     },
@@ -65,8 +69,15 @@ def _process_day(day_input: DayInput, photos: list[PhotoBlob]) -> NewDay:
         "text": analyze_text(day_input.text),
         "photos": analysis.profile,
         "music": music_profile,
+        "context": {
+            "weather": day_input.weather,
+            "weather_source": "chosen" if day_input.weather else "text",
+            "place": day_input.place,
+        },
     }
-    title = make_title(profile["text"])
+    # Погода, выбранная вручную, важнее погоды из текста — и для названия, и для сцены.
+    title_profile = {**profile["text"], "weather": day_input.weather} if day_input.weather else profile["text"]
+    title = make_title(title_profile)
     seed = compute_seed(day_input.text, photo_hashes, day_input.music.url, day_input.music.description)
     visual, explain = build_visual(profile, seed, title)
     return NewDay(

@@ -48,7 +48,9 @@
     },
     "motion": {
       "reveal_ms": 2080,
-      "pulse_ms": 600
+      "pulse_ms": 600,
+      "character": "smooth",
+      "scene": "sun"
     },
     "contrast": 0.42,
     "caption": "Утро, город и солнце"
@@ -133,7 +135,7 @@
       "rule": "R-TEX-01",
       "source": "text.weather",
       "input": "sun",
-      "text_ru": "Заметной погоды в тексте нет, фактура без осадков.",
+      "text_ru": "Осадков и тумана нет, фактура без штриховки.",
       "provenance": "measured"
     },
     {
@@ -209,6 +211,24 @@
       "provenance": "entered"
     },
     {
+      "param": "motion.character",
+      "value": "smooth",
+      "rule": "R-MOT-03",
+      "source": "music.mode",
+      "input": "major",
+      "text_ru": "Мажорный лад (оценён по описанию или выбран) — движение плавное и непрерывное.",
+      "provenance": "entered"
+    },
+    {
+      "param": "motion.scene",
+      "value": "sun",
+      "rule": "R-MOT-04",
+      "source": "text.weather",
+      "input": "sun",
+      "text_ru": "Солнце (в тексте) — пятно света мягко смещается.",
+      "provenance": "measured"
+    },
+    {
       "param": "contrast",
       "value": 0.42,
       "rule": "R-CON-01",
@@ -257,6 +277,11 @@
       "energy": 0.85,
       "mode": "major",
       "provenance": "entered"
+    },
+    "context": {
+      "weather": null,
+      "weather_source": "text",
+      "place": null
     }
   }
 }
