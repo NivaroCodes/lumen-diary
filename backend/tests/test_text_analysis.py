@@ -173,3 +173,14 @@ def test_overcast_weather_is_detected():
     title = make_title(p)
     assert title != FALLBACK_TITLE
     assert "облака" in title
+
+
+def test_title_uses_nominative_case_not_inflected():
+    # ШАГ 1: ключевое слово в названии — именительный падеж, а не падежная форма из текста.
+    p = analyze_text("Гуляли по парку, всё в жёлтых листьях, пахло осенью и дождём.")
+    assert "парку" in p["keywords"]  # в тексте слово в дательном падеже
+    title = make_title(p)
+    assert "Парк" in title and "Парку" not in title, title
+    # Ещё формы: «комнате» -> «комната», «совещания» -> «совещание», «офисе» -> «офис».
+    assert make_title(analyze_text("Вечер провели в комнате, шёл дождь.")) == "Вечер, комната и дождь"
+    assert "офис" in make_title(analyze_text("Ночью сидели в офисе, за окном огни города.")).lower()
