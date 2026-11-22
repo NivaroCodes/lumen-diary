@@ -1,18 +1,18 @@
 {
-  "id": "f396aa05-c4ff-4277-b14c-5e08ad55ba37",
+  "id": "4007f2f6-4ebd-48e8-a9b3-c51adfc0d80e",
   "title": "Ночь, офис и город",
   "date": "2026-11-21",
   "folder": "2026-11-21 Ночь, офис и город",
   "text": "Офис ночью совсем пустой, только наш стол и огни города за стеклом. Завтра сдача. Работали без перерыва. Написали последние тесты. Сделали открытку заново. Отправили сборку. Позвонили команде. Поужинали холодной пиццей. Кофе остыл. В три часа ночи всё заработало, и мы посмотрели друг на друга молча.",
   "photos": [
-    "/media/f396aa05-c4ff-4277-b14c-5e08ad55ba37/photo-1.jpg",
-    "/media/f396aa05-c4ff-4277-b14c-5e08ad55ba37/photo-2.jpg"
+    "/media/4007f2f6-4ebd-48e8-a9b3-c51adfc0d80e/photo-1.jpg",
+    "/media/4007f2f6-4ebd-48e8-a9b3-c51adfc0d80e/photo-2.jpg"
   ],
   "music": {
     "type": "link",
     "description": "быстрая, энергичная электроника, тёмная",
     "source": "link",
-    "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk",
+    "url": "https://example.com/song-not-chosen",
     "title": null,
     "artist": null,
     "year": null,
@@ -24,7 +24,7 @@
   },
   "visual": {
     "schema_version": "1.0",
-    "seed": 3505988568,
+    "seed": 1773875493,
     "light": {
       "direction_deg": 0,
       "intensity": 0.31,
@@ -57,7 +57,7 @@
     },
     "motion": {
       "reveal_ms": 2080,
-      "pulse_ms": 600,
+      "pulse_ms": 469,
       "character": "sharp",
       "scene": "still"
     },
@@ -214,7 +214,7 @@
     },
     {
       "param": "motion.pulse_ms",
-      "value": 600,
+      "value": 469,
       "rule": "R-MOT-02",
       "source": "music.tempo_bpm",
       "input": 128,
@@ -280,7 +280,7 @@
     },
     "music": {
       "source": "link",
-      "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk",
+      "url": "https://example.com/song-not-chosen",
       "title": null,
       "artist": null,
       "year": null,

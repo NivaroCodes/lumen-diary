@@ -30,8 +30,8 @@ DATA_DIR=<temp>/data <temp>/venv/Scripts/python.exe -m uvicorn app.main:app --po
 | Запрос | Код | Результат |
 |---|---|---|
 | `GET /health` | 200 | `{"status": "ok"}` |
-| `POST /api/days` — день `day-calm` | 201 | название «Вечер, комнате и дождь» |
-| `POST /api/days` — день `day-dense` | 201 | название «День, совещания и туман» |
+| `POST /api/days` — день `day-calm` | 201 | название «Вечер, комната и дождь» |
+| `POST /api/days` — день `day-dense` | 201 | название «День, совещание и туман» |
 | `POST /api/days` — день `day-energy` | 201 | название «Утро, город и солнце» |
 | `GET /api/days?sort=date_desc` | 200 | 3 записи, названия совпадают с POST |
 | `GET /api/days/{id}` (×3) | 200 | названия совпадают с POST и со списком |
@@ -41,7 +41,7 @@ DATA_DIR=<temp>/data <temp>/venv/Scripts/python.exe -m uvicorn app.main:app --po
 
 В логе сервера нет исключений и ответов 500. Папки дней созданы по схеме `<дата>_<id8>`: `2026-11-14_6e152284`, `2026-11-16_aea8ea96`, `2026-11-15_c62bc7ac`.
 
-**Обновление после PR #11:** схема имени папки изменена на `<дата> <название>` (например `2026-11-14 Вечер, комнате и дождь`); старые папки по прежней схеме продолжают читаться (`backend/tests/test_api_days.py::test_legacy_folder_day_still_readable`). Этот прогон не переделывался, актуальные примеры — в `docs/submission/examples/`.
+**Обновление после PR #11:** схема имени папки изменена на `<дата> <название>` (например `2026-11-14 Вечер, комната и дождь`); старые папки по прежней схеме продолжают читаться (`backend/tests/test_api_days.py::test_legacy_folder_day_still_readable`). Этот прогон не переделывался, актуальные примеры — в `docs/submission/examples/`.
 
 ## Что не проверялось здесь
 

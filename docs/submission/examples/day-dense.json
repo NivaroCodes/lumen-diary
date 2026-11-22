@@ -18,7 +18,7 @@
       "mode": "unknown"
     }
   },
-  "title": "День, совещания и туман",
+  "title": "День, совещание и туман",
   "folder": "2026-11-16_aea8ea96",
   "visual": {
     "schema_version": "1.0",
@@ -56,7 +56,7 @@
       "pulse_ms": 600
     },
     "contrast": 0.45,
-    "caption": "День, совещания и туман"
+    "caption": "День, совещание и туман"
   },
   "explain": [
     {

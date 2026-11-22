@@ -1,18 +1,18 @@
 {
-  "id": "d97bfbf8-4007-47c9-b896-ecc99c7bb0ca",
+  "id": "8617e2b0-68ff-4d82-a28e-f42545b08e05",
   "title": "Утро, чай и дождь",
   "date": "2026-11-12",
   "folder": "2026-11-12 Утро, чай и дождь",
   "text": "Утром шёл дождь. Проснулась раньше будильника, заварила чай и долго смотрела в окно на мокрые крыши. Пошла на работу под зонтом, в лужах отражались фонари.",
   "photos": [
-    "/media/d97bfbf8-4007-47c9-b896-ecc99c7bb0ca/photo-1.jpg",
-    "/media/d97bfbf8-4007-47c9-b896-ecc99c7bb0ca/photo-2.jpg"
+    "/media/8617e2b0-68ff-4d82-a28e-f42545b08e05/photo-1.jpg",
+    "/media/8617e2b0-68ff-4d82-a28e-f42545b08e05/photo-2.jpg"
   ],
   "music": {
     "type": "link",
     "description": "умеренная, грустная, с пианино",
     "source": "link",
-    "url": "https://www.youtube.com/watch?v=CvFH_6DNRCY",
+    "url": "https://example.com/song-not-chosen",
     "title": null,
     "artist": null,
     "year": null,
@@ -24,7 +24,7 @@
   },
   "visual": {
     "schema_version": "1.0",
-    "seed": 4238214791,
+    "seed": 2695927352,
     "light": {
       "direction_deg": 90,
       "intensity": 0.53,
@@ -280,7 +280,7 @@
     },
     "music": {
       "source": "link",
-      "url": "https://www.youtube.com/watch?v=CvFH_6DNRCY",
+      "url": "https://example.com/song-not-chosen",
       "title": null,
       "artist": null,
       "year": null,

@@ -19,7 +19,7 @@
 | R-LINE-03 | `music.energy`, `music.genre` | `line.roughness` | roughness = 0.2 + 0.5 × energy; жанр rock или electronic: +0.1 (макс. 1.0) |
 | R-LINE-04 | — | `line.color_index` | всегда 0 |
 | R-MOT-01 | `music.tempo_bpm` | `motion.reveal_ms` | clamp(4000 − 15 × tempo, 800, 4000); null → 2400 |
-| R-MOT-02 | `music.tempo_bpm` | `motion.pulse_ms` | clamp(round(60000 / tempo), 600, 2400); null → 1400 |
+| R-MOT-02 | `music.tempo_bpm` | `motion.pulse_ms` | clamp(round(60000 / tempo), 400, 2400); null → 1400. Нижний порог 400 мс (решение команды), чтобы 100 и 128 BPM давали разный шаг фото |
 | R-MOT-03 | `music.mode` | `motion.character` | major → smooth; minor → sharp; unknown → neutral |
 | R-MOT-04 | `context.weather` (выбор), иначе `text.weather` | `motion.scene` | rain, fog, snow, sun, cloud → та же сцена; иначе still |
 | R-CON-01 | `photos.contrast`, `music.mode` | `contrast` | 0.3 + 0.4 × contrast; +0.1 при minor; −0.05 при major; clamp 0–1 |
