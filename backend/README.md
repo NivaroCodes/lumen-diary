@@ -50,7 +50,7 @@ uvicorn app.main:app --port 8000
 | GET | `/api/days/{id}` | `{id, title, date, text, photos[], music, visual, explain, profile}` |
 | GET | `/media/{id}/photo-N.jpg` | Очищенное фото дня (JPEG без EXIF) |
 
-Поля `POST /api/days` (multipart). Обязательные: `text` (1–5000), `photos` или `photos[]` (1–`MAX_PHOTOS` файлов JPEG/PNG/WebP, формат проверяется по содержимому), `music_url` (http/https, до 500), `music_description` (1–300). Файл песни не принимается (`music_file` в MVP нет). Необязательные: `music_title`, `music_artist` (до 200), `music_year` (1900…текущий), `music_genre` (ambient, pop, rock, electronic, jazz, classical, hip-hop, folk, other, unknown; регистр не важен), `music_tempo_bpm` (40…220), `music_energy` (0…1), `music_mode` (`major`/`minor`/`unknown`), `date` (`YYYY-MM-DD`, по умолчанию сегодня).
+Поля `POST /api/days` (multipart). Обязательные: `text` (1–5000), `photos` или `photos[]` (1–`MAX_PHOTOS` файлов JPEG/PNG/WebP, формат проверяется по содержимому), `music_url` (http/https, до 500), `music_description` (1–300). Файл песни не принимается (`music_file` в MVP нет). Необязательные: `music_title`, `music_artist` (до 200), `music_year` (1900…текущий), `music_genre` (ambient, pop, rock, electronic, jazz, classical, hip-hop, folk, other, unknown; регистр не важен), `music_tempo_bpm` (40…220), `music_energy` (0…1), `music_mode` (`major`/`minor`/`unknown`), `date` (`YYYY-MM-DD`, по умолчанию сегодня). На фронтенде `music_tempo_bpm`, `music_energy` и `music_mode` не вводятся числом: форма оценивает их по `music_description` или по кнопкам «Темп»/«Настроение» (`frontend/src/music-hints.ts`) и передаёт в этих же полях API.
 
 Ошибки: `400 {"error": "validation_error", "field": "...", "message": "..."}`, `413 {"error": "file_too_large", ...}`, `404 {"error": "not_found"}`, `500 {"error": "internal_error"}`. Трассировок в ответах нет. Все ошибки проверки входов имеют код `validation_error`; поле `field` указывает, какой вход неверен.
 
@@ -87,11 +87,13 @@ print(r.status_code, r.json()["title"])  # 201 и название дня
 ```
 DATA_DIR/
   lumen.sqlite3
-  days/<YYYY-MM-DD>_<id8>/
+  days/<YYYY-MM-DD> <название дня>/
     entry.json  profile.json  visual.json  explain.json  memory.json
     photos/photo-1.jpg …
   tmp/            # временные папки при создании, после операции пусто
 ```
+
+Имя папки — дата и короткое название дня (`build_folder_name` в `app/storage.py`), например `2026-11-14 Вечер, комнате и дождь`. При совпадении имён добавляется суффикс ` (2)`, ` (3)` и т. д. Папки, созданные до этой схемы (формат `<YYYY-MM-DD>_<id8>`), продолжают читаться: путь хранится в записи дня, а не пересчитывается.
 
 День создаётся атомарно: запись во `tmp/<id>`, переименование в папку дня, затем commit в SQLite. При ошибке папки удаляются, записи в БД нет. EXIF (включая GPS) в сохранённые фото не попадает.
 
@@ -118,7 +120,7 @@ python -m pytest -q
 5. **`warmth`:** контракт — «отношение красного к синему в доминирующих цветах», задание — `0.5 + (mean R − mean B) / 510` по всем пикселям. Реализована формула из задания.
 6. **Форма `music` в ответе не описана в контракте.** Отдаём объединение формы фикстур (`type`, `description`, `url`, `provenance`) и `DayProfile.music` (`source`, `title`, `artist`, `year`, `genre`, `tempo_bpm`, `energy`, `mode`).
 7. **Поля `music_description`, `music_mode`, `date` отсутствуют в таблице контракта (раздел 6).** Добавлены по заданию; `date` необязательное, нужно, чтобы дни из фикстур получили свои даты. Контракт перечисляет `music_file`, он не реализован (не в MVP).
-8. **Фото отдаются своим маршрутом, а не `StaticFiles`.** URL по заданию `/media/<id>/<file>`, а папка называется `<date>_<id8>`, `StaticFiles` не сопоставит одно с другим. Маршрут принимает только `photo-N.jpg` (защита от выхода из папки). Файлы лежат в `photos/`, а URL без этого сегмента, как в фикстурах.
+8. **Фото отдаются своим маршрутом, а не `StaticFiles`.** URL по заданию `/media/<id>/<file>`, а папка называется `<date> <название>` (раньше `<date>_<id8>`), `StaticFiles` не сопоставит одно с другим. Маршрут принимает только `photo-N.jpg` (защита от выхода из папки). Файлы лежат в `photos/`, а URL без этого сегмента, как в фикстурах.
 9. **Палитра:** при менее чем трёх найденных цветах (например, однотонное фото) контракт требует 3–5 цветов. `build_visual` дополняет нейтральной палитрой по умолчанию и пишет об этом в `explain`.
 10. **R-LINE-03:** жанр теперь из закрытого списка, бонус `+0.1` — для `rock` и `electronic`.
 11. **Погода:** если слов о погоде нет, `weather = "none"` (а не `unknown`), для R-TEX-01 разницы нет.
