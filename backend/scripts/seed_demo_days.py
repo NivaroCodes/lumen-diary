@@ -114,11 +114,11 @@ DAYS = [
         "place": "Офис команды",
         "weather": None,
         # Ссылка на песню НЕ выбрана: плеер не показывается. Проигрывание добавит команда.
-        "music": {"music_url": "https://example.com/song-not-chosen",
-                  "music_description": "быстрая, энергичная электроника, тёмная",
-                  # «быстр» → 128 BPM, 0.85; «тёмн» → минор; «электрон» → electronic
-                  "music_tempo_bpm": "128", "music_energy": "0.85", "music_mode": "minor",
-                  "music_genre": "electronic"},
+        "music": {"music_url": "https://open.spotify.com/track/7bxaFZ1O3cHkgLKMsdC3xR",
+                  "music_title": "Loser",
+                  "music_description": "средняя, психоделическая, тёплая гитара",
+                  # «средн» → 100 BPM, 0.55; «светл» → мажор
+                  "music_tempo_bpm": "100", "music_energy": "0.55", "music_mode": "major"},
     },
     {
         "key": "rain",
@@ -129,7 +129,8 @@ DAYS = [
         "place": None,
         "weather": "rain",
         # Ссылка на песню НЕ выбрана: плеер не показывается. Проигрывание добавит команда.
-        "music": {"music_url": "https://example.com/song-not-chosen",
+        "music": {"music_url": "https://open.spotify.com/track/61iJknbAXSuBflDz3vSQ0b",
+                  "music_title": "U Weren't Here I Really Miss You",
                   "music_description": "умеренная, грустная, с пианино",
                   # «умерен» → 100 BPM, 0.55; «груст» → минор; пианино жанр не задаёт
                   "music_tempo_bpm": "100", "music_energy": "0.55", "music_mode": "minor"},
