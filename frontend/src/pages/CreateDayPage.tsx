@@ -38,6 +38,9 @@ const dayFormFields = [
   ...musicTextFields.map(({ name }) => name),
   ...musicNumberFields.map(({ name }) => name),
 ]
+// Значения по умолчанию: средний темп и тёмное настроение (уходят в отправку, пока пользователь не сменит выбор).
+const defaultTempo: Tempo = 'medium'
+const defaultMood: Mode = 'minor'
 // Положение капель в картинке «Атмосфера дня» (в координатах viewBox 320×224).
 const dropX = [36, 84, 124, 196, 236, 284]
 
@@ -161,13 +164,13 @@ export default function CreateDayPage() {
   const nextPhotoId = useRef(0)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [pending, setPending] = useState(false)
-  const [tempo, setTempo] = useState<Tempo>()
-  const [mood, setMood] = useState<Mode>()
+  const [tempo, setTempo] = useState<Tempo | undefined>(defaultTempo)
+  const [mood, setMood] = useState<Mode | undefined>(defaultMood)
   const submitting = useRef(false)
   const errorFocus = useRef<string | null>(null)
-  // Без выбора карточка показывает среднюю скорость и светлое настроение.
-  const tempoValue: Tempo = tempo ?? 'medium'
-  const moodValue: Mode = mood ?? 'major'
+  // Сброс выбора возвращает значения по умолчанию, как и в начальном состоянии.
+  const tempoValue: Tempo = tempo ?? defaultTempo
+  const moodValue: Mode = mood ?? defaultMood
 
   useEffect(() => {
     if (pending || !errorFocus.current) return
@@ -332,7 +335,7 @@ export default function CreateDayPage() {
                       <path d="M160 136 C 150 134, 142 142, 140 152 M160 136 C 170 134, 178 142, 180 152" className="lm-bud-line" />
                     </g>
                   </svg>
-                  <p className="lm-atmo-caption">{moodValue === 'minor' ? 'Дождь · ночь' : 'Дождь · вечер'}</p>
+                  <p className="lm-atmo-caption">Дождь · вечер</p>
                 </div>
               </section>
 
