@@ -84,12 +84,21 @@ def test_openapi_and_docs_are_still_served(single_origin):
     "/%2e%2e/%2e%2e/etc/passwd",
     "/..%2Fsecret.txt",
     "/assets/..%2F..%2Fsecret.txt",
-    "/%2E%2E%5Csecret.txt",
 ])
 def test_path_traversal_does_not_leak_files(single_origin, path):
     resp = single_origin.get(path)
     assert SECRET not in resp.text
     assert resp.status_code == 404
+
+
+def test_backslash_traversal_does_not_leak_files(single_origin):
+    """%5C = '\\'. На Linux это обычный символ имени: файла нет, отдаётся SPA-фолбэк (index.html).
+    На Windows путь нормализуется за пределы dist и даёт 404. В обоих случаях секрет не отдаётся."""
+    resp = single_origin.get("/%2E%2E%5Csecret.txt")
+    assert SECRET not in resp.text
+    assert resp.status_code in (200, 404)
+    if resp.status_code == 200:
+        assert "LUMEN-INDEX" in resp.text
 
 
 def test_missing_dist_root_returns_hint_and_api_still_works(no_dist_client):
