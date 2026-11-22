@@ -191,7 +191,7 @@ def build_visual(profile: dict[str, Any], seed: int, caption: str) -> tuple[dict
 
     # --- движение ---
     reveal = 2400 if tempo is None else _round_int(_clamp(4000 - 15 * tempo, 800, 4000))
-    pulse = 1400 if tempo is None else _round_int(_clamp(_round_int(60000 / tempo), 600, 2400))
+    pulse = 1400 if tempo is None else _round_int(_clamp(_round_int(60000 / tempo), 400, 2400))
     add("motion.reveal_ms", reveal, "R-MOT-01", "music.tempo_bpm", tempo,
         "Темп не указан, проявка идёт с обычной скоростью." if tempo is None
         else "Медленный темп — длинная проявка." if reveal >= 2800

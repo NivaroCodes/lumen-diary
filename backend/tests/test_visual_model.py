@@ -193,8 +193,8 @@ def test_r_tex_02_grain():
 
 
 @pytest.mark.parametrize("tempo,blur,reveal,pulse", [
-    (60, 0.6, 3100, 1000), (79, 0.6, 2815, 759), (80, 0.3, 2800, 750), (110, 0.3, 2350, 545 + 55),
-    (111, 0.1, 2335, 600), (200, 0.1, 1000, 600), (220, 0.1, 800, 600), (40, 0.6, 3400, 1500),
+    (60, 0.6, 3100, 1000), (79, 0.6, 2815, 759), (80, 0.3, 2800, 750), (110, 0.3, 2350, 545),
+    (111, 0.1, 2335, 541), (200, 0.1, 1000, 400), (220, 0.1, 800, 400), (40, 0.6, 3400, 1500),
     (None, 0.1, 2400, 1400),
 ])
 def test_r_tex_03_and_r_mot(tempo, blur, reveal, pulse):
@@ -274,3 +274,12 @@ def test_chosen_weather_overrides_text_weather():
     tex = next(e for e in explain if e["param"] == "texture.weather")
     assert tex["source"] == "context.weather" and tex["provenance"] == "entered"
     assert "по выбору в записи" in tex["text_ru"]
+
+
+def test_pulse_floor_400_separates_fast_tempos():
+    # ШАГ 2: порог R-MOT-02 снижен до 400 мс, 128 и 100 BPM дают разный шаг фото (пульс).
+    office, _ = build_visual(_profile_variant(music__tempo_bpm=128), 1, "c")
+    rain, _ = build_visual(_profile_variant(music__tempo_bpm=100), 1, "c")
+    assert office["motion"]["pulse_ms"] == 469
+    assert rain["motion"]["pulse_ms"] == 600
+    assert office["motion"]["pulse_ms"] != rain["motion"]["pulse_ms"]

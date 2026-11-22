@@ -48,7 +48,7 @@
     },
     "motion": {
       "reveal_ms": 2080,
-      "pulse_ms": 600,
+      "pulse_ms": 469,
       "character": "smooth",
       "scene": "sun"
     },
@@ -203,7 +203,7 @@
     },
     {
       "param": "motion.pulse_ms",
-      "value": 600,
+      "value": 469,
       "rule": "R-MOT-02",
       "source": "music.tempo_bpm",
       "input": 128,
