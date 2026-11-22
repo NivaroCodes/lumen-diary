@@ -435,7 +435,7 @@ export default function CreateDayPage() {
                       <span id="music-tempo-label" className="lm-small">Темп</span>
                       <div className="lm-chips">
                         {tempoOptions.map(({ value, label }) => (
-                          <button key={value} type="button" aria-pressed={tempoValue === value} className="lm-chip"
+                          <button key={value} type="button" aria-pressed={tempo === value} className="lm-chip"
                             onClick={() => { setTempo(tempo === value ? undefined : value); setErrors((p) => ({ ...p, music_tempo_bpm: '', music_energy: '' })) }}>
                             {label}
                           </button>
@@ -448,7 +448,7 @@ export default function CreateDayPage() {
                       <span id="music-mood-label" className="lm-small">Настроение</span>
                       <div className="lm-chips">
                         {moodOptions.map(({ value, label }) => (
-                          <button key={value} type="button" aria-pressed={moodValue === value} className="lm-chip"
+                          <button key={value} type="button" aria-pressed={mood === value} className="lm-chip"
                             onClick={() => { setMood(mood === value ? undefined : value); setErrors((p) => ({ ...p, music_mode: '' })) }}>
                             {label}
                           </button>
