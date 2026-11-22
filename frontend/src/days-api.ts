@@ -158,3 +158,15 @@ export function isMusicUrl(value: string) {
     return false
   }
 }
+
+// Ссылка на трек Spotify: убираем query и фрагмент (?si=…, utm_*), оставляем /track/<id>. Остальное не меняем.
+export function normalizeMusicUrl(url: string): string {
+  try {
+    const parsed = new URL(url)
+    if (parsed.protocol !== 'https:' || parsed.hostname !== 'open.spotify.com') return url
+    const match = /^\/track\/([A-Za-z0-9]+)\/?$/.exec(parsed.pathname)
+    return match ? `https://open.spotify.com/track/${match[1]}` : url
+  } catch {
+    return url
+  }
+}
