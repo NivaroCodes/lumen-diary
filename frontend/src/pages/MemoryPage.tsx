@@ -5,7 +5,7 @@ import Postcard from '../components/Postcard'
 import type { WhyGroup } from '../components/Postcard'
 import { formatLongDate } from '../components/postcard-model'
 import { motionPlan } from '../components/postcard-motion'
-import { errorMessage, getDay, musicEmbed } from '../days-api'
+import { errorMessage, getDay, musicEmbed, songTitle } from '../days-api'
 import type { DayRecord, ExplainItem } from '../days-api'
 import SpeakButton from '../components/SpeakButton'
 import Letters from '../components/Letters'
@@ -153,7 +153,7 @@ export default function MemoryPage() {
 
         <section aria-labelledby="music-title">
           <h2 id="music-title" className="section-title">Песня дня</h2>
-          {music.description && <p className="music-desc">«{music.description}»</p>}
+          <p className="music-desc">{songTitle(music)}</p>
           <ul className="music-meta" aria-label="Что система знает о песне">
             {typeof music.tempo_bpm === 'number'
               ? <li>Темп {music.tempo_bpm} BPM</li>
@@ -167,18 +167,18 @@ export default function MemoryPage() {
           {!mode && (
             <p className="why-note">Лад неизвестен, поэтому контраст задают только фото, а движение остаётся нейтральным.</p>
           )}
-          {embed ? (
+          {/* Spotify встраиваем. YouTube часто запрещает встраивание и показывает серую ошибку,
+              поэтому вместо плеера даём карточку: название песни (выше) и кнопку «Открыть по ссылке». */}
+          {embed?.kind === 'spotify' && (
             <iframe
               src={embed.src}
               title={embed.title}
-              className={embed.kind === 'youtube' ? 'player player-video' : 'player'}
-              height={embed.kind === 'spotify' ? 152 : undefined}
+              className="player"
+              height={152}
               loading="lazy"
               allow="encrypted-media; clipboard-write; picture-in-picture"
               referrerPolicy="strict-origin-when-cross-origin"
             />
-          ) : (
-            music.url && <p className="why-note">Плеер показываем для ссылок Spotify и YouTube.</p>
           )}
           {music.url && (
             <p style={{ margin: '12px 0 0' }}>

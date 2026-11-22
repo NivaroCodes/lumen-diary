@@ -212,3 +212,8 @@ export function musicEmbed(url: string | undefined): MusicEmbed | null {
     return null
   }
 }
+
+// Название песни для показа. Пустое поле → «Песня без названия». Описание звучания сюда не подставляем.
+export function songTitle(music: { title?: string | null }): string {
+  return (music.title ?? '').trim() || 'Песня без названия'
+}
