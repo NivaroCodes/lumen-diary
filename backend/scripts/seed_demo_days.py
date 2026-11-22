@@ -96,8 +96,9 @@ DAYS = [
         "photos": [park(0), park(1), park(2)],
         "place": "Парк у пруда",
         "weather": "sun",
-        # Ссылка на реальный трек; название песни НЕ подставлено — требует проверки перед показом.
+        # Реальный трек из Spotify; название как в Spotify.
         "music": {"music_url": "https://open.spotify.com/track/61iJknbAXSuBflDz3vSQ0b",
+                  "music_title": "U Weren't Here I Really Miss You",
                   "music_description": "медленная, светлая, тёплая акустика",
                   # inferMusicHints: «медлен» → 68 BPM, энергия 0.25; «светл» → мажор
                   "music_tempo_bpm": "68", "music_energy": "0.25", "music_mode": "major"},

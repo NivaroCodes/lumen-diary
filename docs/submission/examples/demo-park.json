@@ -1,20 +1,20 @@
 {
-  "id": "ef599475-2b86-4a49-a90a-b1207ba92de1",
+  "id": "026b3c20-5f7a-4f4b-a3bd-19972ddd7e25",
   "title": "День, парк и солнце",
   "date": "2026-10-18",
   "folder": "2026-10-18 День, парк и солнце",
   "text": "Парк днём был жёлто-красным. Листья шуршали под ногами, мы купили какао в бумажных стаканах и сели на скамейку у пруда. Солнце грело сквозь клёны. Говорили о пустяках и смеялись.",
   "photos": [
-    "/media/ef599475-2b86-4a49-a90a-b1207ba92de1/photo-1.jpg",
-    "/media/ef599475-2b86-4a49-a90a-b1207ba92de1/photo-2.jpg",
-    "/media/ef599475-2b86-4a49-a90a-b1207ba92de1/photo-3.jpg"
+    "/media/026b3c20-5f7a-4f4b-a3bd-19972ddd7e25/photo-1.jpg",
+    "/media/026b3c20-5f7a-4f4b-a3bd-19972ddd7e25/photo-2.jpg",
+    "/media/026b3c20-5f7a-4f4b-a3bd-19972ddd7e25/photo-3.jpg"
   ],
   "music": {
     "type": "link",
     "description": "медленная, светлая, тёплая акустика",
     "source": "link",
     "url": "https://open.spotify.com/track/61iJknbAXSuBflDz3vSQ0b",
-    "title": null,
+    "title": "U Weren't Here I Really Miss You",
     "artist": null,
     "year": null,
     "genre": "unknown",
@@ -282,7 +282,7 @@
     "music": {
       "source": "link",
       "url": "https://open.spotify.com/track/61iJknbAXSuBflDz3vSQ0b",
-      "title": null,
+      "title": "U Weren't Here I Really Miss You",
       "artist": null,
       "year": null,
       "genre": "unknown",
