@@ -1,0 +1,22 @@
+# Render Blueprint для Lumen Diary (один веб-сервис из Dockerfile).
+# Деплой: подключите репозиторий в Render → New → Blueprint. Секретов нет.
+services:
+  - type: web
+    name: lumen-diary
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    envVars:
+      - key: DATA_DIR
+        value: /data
+      - key: MAX_UPLOAD_MB
+        value: "10"
+      - key: MAX_PHOTOS
+        value: "5"
+    # Бесплатный диск Render не сохраняется между деплоями. Для постоянного
+    # хранения дней подключите платный диск и смонтируйте его в /data:
+    # disk:
+    #   name: lumen-data
+    #   mountPath: /data
+    #   sizeGB: 1
+    healthCheckPath: /health
