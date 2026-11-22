@@ -43,6 +43,7 @@ class DayRecord(BaseModel):
     id: str
     title: str
     date: str
+    folder: str | None = None  # имя папки дня на диске (для старых дней — прежний формат)
     text: str
     photos: list[str]
     music: dict[str, Any]
