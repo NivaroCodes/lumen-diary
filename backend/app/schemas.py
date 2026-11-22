@@ -30,6 +30,8 @@ class DayInput(BaseModel):
     text: str = Field(min_length=1, max_length=5000)
     date: str  # YYYY-MM-DD
     music: MusicInput
+    weather: Literal["rain", "fog", "cloud", "sun"] | None = None  # выбор пользователя, без внешних API
+    place: str | None = Field(default=None, max_length=80)  # место вручную, без геолокации
 
 
 class DaySummary(BaseModel):
@@ -37,6 +39,11 @@ class DaySummary(BaseModel):
     title: str
     date: str
     preview_url: str | None
+    # Для мини-открыток в архиве (необязательные, добавлены без изменения прежних полей).
+    folder: str | None = None
+    place: str | None = None
+    photos: list[str] = []
+    visual: dict[str, Any] | None = None
 
 
 class DayRecord(BaseModel):

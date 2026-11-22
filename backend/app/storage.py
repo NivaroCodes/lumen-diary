@@ -187,7 +187,8 @@ class Storage:
     def list_days(self) -> list[dict[str, Any]]:
         with closing(self._connect()) as conn:
             rows = conn.execute(
-                "SELECT id, title, date, profile_json FROM days ORDER BY date DESC, created_at DESC"
+                "SELECT id, title, date, folder, profile_json, visual_json FROM days"
+                " ORDER BY date DESC, created_at DESC"
             ).fetchall()
         return [
             {
@@ -195,6 +196,10 @@ class Storage:
                 "title": r["title"],
                 "date": r["date"],
                 "preview_url": media_url(r["id"], 1) if _photo_count(r["profile_json"]) else None,
+                "folder": r["folder"],
+                "place": (json.loads(r["profile_json"]).get("context") or {}).get("place"),
+                "photos": [media_url(r["id"], i) for i in range(1, _photo_count(r["profile_json"]) + 1)],
+                "visual": json.loads(r["visual_json"]),
             }
             for r in rows
         ]

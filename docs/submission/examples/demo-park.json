@@ -1,0 +1,300 @@
+{
+  "id": "026b3c20-5f7a-4f4b-a3bd-19972ddd7e25",
+  "title": "День, парк и солнце",
+  "date": "2026-10-18",
+  "folder": "2026-10-18 День, парк и солнце",
+  "text": "Парк днём был жёлто-красным. Листья шуршали под ногами, мы купили какао в бумажных стаканах и сели на скамейку у пруда. Солнце грело сквозь клёны. Говорили о пустяках и смеялись.",
+  "photos": [
+    "/media/026b3c20-5f7a-4f4b-a3bd-19972ddd7e25/photo-1.jpg",
+    "/media/026b3c20-5f7a-4f4b-a3bd-19972ddd7e25/photo-2.jpg",
+    "/media/026b3c20-5f7a-4f4b-a3bd-19972ddd7e25/photo-3.jpg"
+  ],
+  "music": {
+    "type": "link",
+    "description": "медленная, светлая, тёплая акустика",
+    "source": "link",
+    "url": "https://open.spotify.com/track/61iJknbAXSuBflDz3vSQ0b",
+    "title": "U Weren't Here I Really Miss You",
+    "artist": null,
+    "year": null,
+    "genre": "unknown",
+    "tempo_bpm": 68,
+    "energy": 0.25,
+    "mode": "major",
+    "provenance": "entered"
+  },
+  "visual": {
+    "schema_version": "1.0",
+    "seed": 2382119419,
+    "light": {
+      "direction_deg": 180,
+      "intensity": 0.62,
+      "temperature_k": 3814
+    },
+    "palette": {
+      "colors": [
+        "#B36D32",
+        "#E3CFA2",
+        "#EBB74C",
+        "#4F3321",
+        "#C79C67"
+      ],
+      "saturation": 0.45
+    },
+    "density": {
+      "value": 0.2,
+      "elements": 4
+    },
+    "texture": {
+      "grain": 0.2,
+      "blur": 0.6,
+      "weather": "none"
+    },
+    "line": {
+      "trajectory": "wave",
+      "amplitude": 0.3,
+      "roughness": 0.33,
+      "color_index": 0
+    },
+    "motion": {
+      "reveal_ms": 2980,
+      "pulse_ms": 882,
+      "character": "smooth",
+      "scene": "sun"
+    },
+    "contrast": 0.4,
+    "caption": "День, парк и солнце"
+  },
+  "explain": [
+    {
+      "param": "light.direction_deg",
+      "value": 180,
+      "rule": "R-LIGHT-01",
+      "source": "text.time_of_day",
+      "input": "day",
+      "text_ru": "День в тексте — свет идёт с нижней стороны открытки, а ночь — с верхней. Направление задано правилом времени суток, а не положением реального солнца.",
+      "provenance": "measured"
+    },
+    {
+      "param": "light.intensity",
+      "value": 0.62,
+      "rule": "R-LIGHT-02",
+      "source": "photos.brightness",
+      "input": 0.5989,
+      "text_ru": "Средняя яркость фото даёт ровный свет.",
+      "provenance": "measured"
+    },
+    {
+      "param": "light.temperature_k",
+      "value": 3814,
+      "rule": "R-LIGHT-03",
+      "source": "photos.warmth",
+      "input": 0.7069,
+      "text_ru": "Тёплые цвета фото задают тёплую температуру света.",
+      "provenance": "measured"
+    },
+    {
+      "param": "palette.colors",
+      "value": [
+        "#B36D32",
+        "#E3CFA2",
+        "#EBB74C",
+        "#4F3321",
+        "#C79C67"
+      ],
+      "rule": "R-PAL-01",
+      "source": "photos.dominant_colors",
+      "input": [
+        "#B36D32",
+        "#E3CFA2",
+        "#EBB74C",
+        "#4F3321",
+        "#C79C67"
+      ],
+      "text_ru": "Цвета взяты из доминирующих цветов фото.",
+      "provenance": "measured"
+    },
+    {
+      "param": "palette.saturation",
+      "value": 0.45,
+      "rule": "R-PAL-02",
+      "source": "photos.contrast",
+      "input": 0.3793,
+      "text_ru": "Умеренный контраст фото даёт сдержанную насыщенность.",
+      "provenance": "measured"
+    },
+    {
+      "param": "density.value",
+      "value": 0.2,
+      "rule": "R-DEN-01",
+      "source": "text.events_count",
+      "input": 1,
+      "text_ru": "В тексте событий: 1, слов: 29. Немного событий — композиция разреженная.",
+      "provenance": "measured"
+    },
+    {
+      "param": "density.elements",
+      "value": 4,
+      "rule": "R-DEN-02",
+      "source": "density.value",
+      "input": 0.2,
+      "text_ru": "Мало элементов — больше пустого пространства.",
+      "provenance": "measured"
+    },
+    {
+      "param": "texture.weather",
+      "value": "none",
+      "rule": "R-TEX-01",
+      "source": "context.weather",
+      "input": "sun",
+      "text_ru": "Осадков и тумана нет, фактура без штриховки.",
+      "provenance": "entered"
+    },
+    {
+      "param": "texture.grain",
+      "value": 0.2,
+      "rule": "R-TEX-02",
+      "source": "photos.brightness",
+      "input": 0.5989,
+      "text_ru": "Светлые фото получают меньше зерна.",
+      "provenance": "measured"
+    },
+    {
+      "param": "texture.blur",
+      "value": 0.6,
+      "rule": "R-TEX-03",
+      "source": "music.tempo_bpm",
+      "input": 68,
+      "text_ru": "Медленный темп песни (оценён по описанию или выбран) делает изображение мягче.",
+      "provenance": "entered"
+    },
+    {
+      "param": "line.trajectory",
+      "value": "wave",
+      "rule": "R-LINE-01",
+      "source": "text.time_of_day",
+      "input": "day",
+      "text_ru": "День или время суток не определено — линия волнистая.",
+      "provenance": "measured"
+    },
+    {
+      "param": "line.amplitude",
+      "value": 0.3,
+      "rule": "R-LINE-02",
+      "source": "music.energy",
+      "input": 0.25,
+      "text_ru": "Низкая энергия песни (оценена по описанию или выбрана) задаёт небольшой размах линии.",
+      "provenance": "entered"
+    },
+    {
+      "param": "line.roughness",
+      "value": 0.33,
+      "rule": "R-LINE-03",
+      "source": "music.energy",
+      "input": 0.25,
+      "text_ru": "Спокойная музыка даёт гладкую линию.",
+      "provenance": "entered"
+    },
+    {
+      "param": "line.color_index",
+      "value": 0,
+      "rule": "R-LINE-04",
+      "source": "system",
+      "input": null,
+      "text_ru": "Линия всегда берёт первый цвет палитры, чтобы узнаваться в каждом дне.",
+      "provenance": "measured"
+    },
+    {
+      "param": "motion.reveal_ms",
+      "value": 2980,
+      "rule": "R-MOT-01",
+      "source": "music.tempo_bpm",
+      "input": 68,
+      "text_ru": "Медленный темп — длинная проявка.",
+      "provenance": "entered"
+    },
+    {
+      "param": "motion.pulse_ms",
+      "value": 882,
+      "rule": "R-MOT-02",
+      "source": "music.tempo_bpm",
+      "input": 68,
+      "text_ru": "Пульс движения соответствует темпу песни.",
+      "provenance": "entered"
+    },
+    {
+      "param": "motion.character",
+      "value": "smooth",
+      "rule": "R-MOT-03",
+      "source": "music.mode",
+      "input": "major",
+      "text_ru": "Мажорный лад (оценён по описанию или выбран) — движение плавное и непрерывное.",
+      "provenance": "entered"
+    },
+    {
+      "param": "motion.scene",
+      "value": "sun",
+      "rule": "R-MOT-04",
+      "source": "context.weather",
+      "input": "sun",
+      "text_ru": "Солнце (по выбору в записи) — пятно света мягко смещается.",
+      "provenance": "entered"
+    },
+    {
+      "param": "contrast",
+      "value": 0.4,
+      "rule": "R-CON-01",
+      "source": "music.mode",
+      "input": "major",
+      "text_ru": "Мажорный лад (оценён по описанию или выбран) слегка смягчает контраст фото.",
+      "provenance": "entered"
+    }
+  ],
+  "profile": {
+    "text": {
+      "time_of_day": "day",
+      "season": "unknown",
+      "environment": "nature",
+      "weather": "sun",
+      "events_count": 1,
+      "length_words": 29,
+      "keywords": [
+        "парк",
+        "солнце",
+        "жёлто-красным",
+        "листья",
+        "ногами"
+      ]
+    },
+    "photos": {
+      "count": 3,
+      "dominant_colors": [
+        "#B36D32",
+        "#E3CFA2",
+        "#EBB74C",
+        "#4F3321",
+        "#C79C67"
+      ],
+      "brightness": 0.5989,
+      "contrast": 0.3793,
+      "warmth": 0.7069
+    },
+    "music": {
+      "source": "link",
+      "url": "https://open.spotify.com/track/61iJknbAXSuBflDz3vSQ0b",
+      "title": "U Weren't Here I Really Miss You",
+      "artist": null,
+      "year": null,
+      "genre": "unknown",
+      "tempo_bpm": 68,
+      "energy": 0.25,
+      "mode": "major",
+      "provenance": "entered"
+    },
+    "context": {
+      "weather": "sun",
+      "weather_source": "chosen",
+      "place": "Парк у пруда"
+    }
+  }
+}

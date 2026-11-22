@@ -105,6 +105,14 @@ export function buildLine({ trajectory, amplitude, roughness }: VisualModel['lin
   return [`M${format(points[0])}`, ...segments, `L${format(points[points.length - 1])}`].join(' ')
 }
 
+// Источник света в долях открытки и цвет света по температуре (R-LIGHT-01, R-LIGHT-03).
+export function lightGeometry({ light }: VisualModel) {
+  const temperature = (light.temperature_k - 2700) / 3800
+  const tint = mix([255, 192, 120], [189, 220, 255], temperature)
+  const radians = light.direction_deg * Math.PI / 180
+  return { x: 0.5 - 0.5 * Math.sin(radians), y: 0.5 - 0.5 * Math.cos(radians), tint }
+}
+
 export function postcardAppearance({ palette, light, line, contrast }: VisualModel) {
   const colors = palette.colors
   const paper = mix(charcoal, hexToRgb(colors[0]), 0.30)

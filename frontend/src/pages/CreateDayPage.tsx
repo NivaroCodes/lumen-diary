@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { CSSProperties, FormEvent } from 'react'
 import { useNavigate } from 'react-router'
-import { createDay, DayApiError, errorMessage, isMusicUrl } from '../days-api'
+import { createDay, DayApiError, errorMessage, isMusicUrl, normalizeMusicUrl } from '../days-api'
 import { inferMusicHints } from '../music-hints'
 import type { Mode, Tempo } from '../music-hints'
 import './create-day.css'
@@ -33,8 +33,17 @@ const moodOptions: { value: Mode; label: string }[] = [
 ]
 // Поля, которых нет в форме как отдельных элементов: их ошибки показываем в разделе «Уточнить».
 const refineFields = ['music_tempo_bpm', 'music_energy', 'music_mode']
+type Weather = 'rain' | 'fog' | 'cloud' | 'sun'
+// Погода выбирается вручную, без внешних API. Без выбора погода берётся из текста записи.
+const weatherOptions: { value: Weather; label: string }[] = [
+  { value: 'rain', label: 'Дождь' },
+  { value: 'fog', label: 'Туман' },
+  { value: 'cloud', label: 'Облачно' },
+  { value: 'sun', label: 'Солнце' },
+]
+const maxPlaceLength = 80
 const dayFormFields = [
-  'text', 'date', 'music_url', 'music_description', 'music_genre',
+  'text', 'date', 'place', 'music_url', 'music_description', 'music_genre',
   ...musicTextFields.map(({ name }) => name),
   ...musicNumberFields.map(({ name }) => name),
 ]
@@ -90,6 +99,7 @@ function validateMusic(form: HTMLFormElement, data: FormData, choices: { tempo?:
   else if (!/^https?:\/\/[^/?#\\]/i.test(url) || !isMusicUrl(url)) {
     errors.music_url = 'Укажите адрес песни, который начинается с https:// или http://.'
   }
+  else data.set('music_url', normalizeMusicUrl(url))
 
   if (!description) errors.music_description = 'Коротко опишите песню.'
   else if ([...description].length > maxMusicDescriptionLength) {
@@ -167,6 +177,7 @@ export default function CreateDayPage() {
   // undefined = пользователь ничего не выбрал: в отправку ничего не уходит, темп и лад берутся из описания.
   const [tempo, setTempo] = useState<Tempo>()
   const [mood, setMood] = useState<Mode>()
+  const [weather, setWeather] = useState<Weather>()
   const submitting = useRef(false)
   const errorFocus = useRef<string | null>(null)
   // Только отображение: карточка и подсветка чипов показывают умолчания, но в отправку они не попадают.
@@ -199,6 +210,11 @@ export default function CreateDayPage() {
     const photoError = validatePhotos(photos.map(({ file }) => file))
     if (photoError) fieldErrors.photos = photoError
     Object.assign(fieldErrors, validateMusic(form, data, { tempo, mode: mood }))
+    const place = trimField(String(data.get('place') ?? '')).replace(/\s+/g, ' ')
+    if ([...place].length > maxPlaceLength) fieldErrors.place = `Сократите место до ${maxPlaceLength} символов.`
+    if (place) data.set('place', place)
+    else data.delete('place')
+    if (weather) data.set('weather', weather)
     setErrors(fieldErrors)
     const firstError = Object.keys(fieldErrors)[0]
     if (firstError) {
@@ -213,7 +229,7 @@ export default function CreateDayPage() {
     setPending(true)
     try {
       const day = await createDay(data)
-      navigate(`/memory/${encodeURIComponent(day.id)}`)
+      navigate(`/memory/${encodeURIComponent(day.id)}`, { viewTransition: true })
     } catch (error) {
       const name = error instanceof DayApiError ? error.field : undefined
       const control = name ? form.elements.namedItem(name) : null
@@ -325,18 +341,47 @@ export default function CreateDayPage() {
             <div className="lm-col">
               <section aria-labelledby="atmo-title" className="lm-block">
                 <h2 id="atmo-title" className="lm-label">Атмосфера дня</h2>
-                <div className="lm-atmo" data-tempo={tempoValue} data-mood={moodValue}>
+                <div className="lm-atmo" data-tempo={tempoValue} data-mood={moodValue} data-weather={weather ?? 'text'}>
                   <svg className="lm-atmo-svg" viewBox="0 0 320 224" aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMid slice">
                     {dropX.map((x, index) => (
                       <line key={x} x1={x} x2={x} y1={0} y2={14} className="lm-drop" style={{ '--i': index } as CSSProperties} />
                     ))}
+                    <circle cx={248} cy={56} r={22} className="lm-sun" />
+                    <g className="lm-fog">
+                      {[60, 92, 124].map((y, index) => (
+                        <line key={y} x1={20 + index * 18} x2={300 - index * 24} y1={y} y2={y} style={{ '--i': index } as CSSProperties} />
+                      ))}
+                    </g>
+                    <path d="M196 70 a18 18 0 0 1 34 -8 a14 14 0 0 1 24 10 a12 12 0 0 1 -4 24 h-50 a14 14 0 0 1 -4 -26 z" className="lm-cloud" />
                     <g className="lm-bud">
                       <line x1={160} y1={136} x2={160} y2={200} className="lm-bud-line" />
                       <path d="M160 136 C 146 120, 142 98, 160 74 C 178 98, 174 120, 160 136 Z" className="lm-bud-line lm-petals" />
                       <path d="M160 136 C 150 134, 142 142, 140 152 M160 136 C 170 134, 178 142, 180 152" className="lm-bud-line" />
                     </g>
                   </svg>
-                  <p className="lm-atmo-caption">Дождь · вечер</p>
+                  <p className="lm-atmo-caption">
+                    {weather ? weatherOptions.find((option) => option.value === weather)?.label : 'Погода по тексту записи'}
+                  </p>
+                </div>
+                <div className="lm-line-field" role="group" aria-labelledby="weather-label">
+                  <span id="weather-label" className="lm-small">Погода (необязательно)</span>
+                  <p className="lm-hint">Выбор важнее слов в тексте: он задаёт фоновую сцену и фактуру открытки.</p>
+                  <div className="lm-chips">
+                    {weatherOptions.map(({ value, label }) => (
+                      <button key={value} type="button" aria-pressed={weather === value} className="lm-chip"
+                        onClick={() => setWeather(weather === value ? undefined : value)}>
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="lm-line-field">
+                  <label htmlFor="place" className="lm-small">Где это было (необязательно)</label>
+                  <div className="lm-line-wrap">
+                    <input {...field('place', 'lm-line-input')} type="text" maxLength={120} autoComplete="off" placeholder="Например: парк у дома" />
+                    <span className="lm-line" aria-hidden="true" />
+                  </div>
+                  {feedback('place')}
                 </div>
               </section>
 
@@ -390,7 +435,7 @@ export default function CreateDayPage() {
                       <span id="music-tempo-label" className="lm-small">Темп</span>
                       <div className="lm-chips">
                         {tempoOptions.map(({ value, label }) => (
-                          <button key={value} type="button" aria-pressed={tempoValue === value} className="lm-chip"
+                          <button key={value} type="button" aria-pressed={tempo === value} className="lm-chip"
                             onClick={() => { setTempo(tempo === value ? undefined : value); setErrors((p) => ({ ...p, music_tempo_bpm: '', music_energy: '' })) }}>
                             {label}
                           </button>
@@ -403,7 +448,7 @@ export default function CreateDayPage() {
                       <span id="music-mood-label" className="lm-small">Настроение</span>
                       <div className="lm-chips">
                         {moodOptions.map(({ value, label }) => (
-                          <button key={value} type="button" aria-pressed={moodValue === value} className="lm-chip"
+                          <button key={value} type="button" aria-pressed={mood === value} className="lm-chip"
                             onClick={() => { setMood(mood === value ? undefined : value); setErrors((p) => ({ ...p, music_mode: '' })) }}>
                             {label}
                           </button>
@@ -417,13 +462,13 @@ export default function CreateDayPage() {
 
               <p id="form-error" role="alert" tabIndex={-1} className="lm-error">{errors.form}</p>
               <button type="submit" className="lm-primary">
-                {pending ? 'Сохраняем день…' : errors.form ? 'Повторить отправку' : 'Создать открытку'}
+                {pending ? 'Проявляем открытку…' : errors.form ? 'Повторить отправку' : 'Создать открытку'}
               </button>
             </div>
           </div>
         </fieldset>
       </form>
-      <p role="status" className="lm-sr-only">{pending ? 'Сохраняем день…' : ''}</p>
+      <p role="status" className="lm-sr-only">{pending ? 'Проявляем открытку…' : ''}</p>
     </div>
   )
 }

@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./styles/tokens.css";
+@import "./styles/site.css";
 
 html {
     min-height: 100%;
@@ -11,7 +12,8 @@ body {
     min-height: 100vh;
     background-color: var(--color-background);
     color: var(--color-text);
-    font-family: var(--font-sans), sans-serif;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
 }
 
 #root {
@@ -24,5 +26,5 @@ button:enabled {
 
 ::selection {
     background-color: var(--color-accent);
-    color: var(--color-background);
+    color: var(--color-surface);
 }

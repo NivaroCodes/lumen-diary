@@ -93,7 +93,8 @@ def test_archive_lists_three_days_newest_first(client, three_days):
     assert dates == sorted(dates, reverse=True)
     assert {i["id"] for i in items} == {d["id"] for d in three_days.values()}
     for item in items:
-        assert set(item) == {"id", "title", "date", "preview_url"}
+        assert set(item) == {"id", "title", "date", "preview_url", "folder", "place", "photos", "visual"}
+        assert item["visual"]["caption"] == item["title"]
         assert client.get(item["preview_url"]).status_code == 200
 
 
@@ -211,3 +212,34 @@ def test_legacy_folder_day_still_readable(client, settings, three_days):
     assert got.status_code == 200 and got.json()["folder"] == legacy
     assert d["id"] in {i["id"] for i in client.get("/api/days").json()}
     assert client.get(got.json()["photos"][0]).status_code == 200
+
+
+def test_same_input_gives_same_visual(client):
+    """Тест логики: одинаковый вход через API даёт одинаковый визуал и объяснение."""
+    fx, fields, photos = fixture_request("day-calm")
+    first = post_day(client, fields, photos).json()
+    second = post_day(client, fields, photos).json()
+    assert first["id"] != second["id"]
+    assert first["visual"] == second["visual"]
+    assert first["explain"] == second["explain"]
+    assert first["title"] == second["title"]
+
+
+def test_weather_and_place_are_saved_and_drive_scene(client):
+    fields = {"text": "Утром гуляла по парку и пила какао.", "music_url": "https://example.com/s",
+              "music_description": "тихая", "weather": "fog", "place": "  Алматы,   парк  "}
+    resp = post_day(client, fields)
+    assert resp.status_code == 201, resp.text
+    day = resp.json()
+    assert day["profile"]["context"] == {"weather": "fog", "weather_source": "chosen", "place": "Алматы, парк"}
+    assert day["visual"]["motion"]["scene"] == "fog"
+    assert day["visual"]["texture"]["weather"] == "fog"
+    assert "туман" in day["title"].lower()
+
+
+@pytest.mark.parametrize("field,value", [("weather", "snowstorm"), ("place", "x" * 81)])
+def test_weather_and_place_validation(client, field, value):
+    fields = {"text": "День.", "music_url": "https://example.com/s", "music_description": "тихая", field: value}
+    resp = post_day(client, fields)
+    assert resp.status_code == 400
+    assert resp.json()["field"] == field
