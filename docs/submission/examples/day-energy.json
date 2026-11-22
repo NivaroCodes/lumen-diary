@@ -1,0 +1,228 @@
+{
+  "day": "day-energy",
+  "source": "tests/fixtures/raw/day-energy/input.json (вход, как в POST /api/days при чистом запуске)",
+  "input": {
+    "date": "2026-11-15",
+    "text": "Проснулась рано, когда солнце только поднялось над крышами, и сразу вскочила с кровати. Выпила кофе на балконе, пока город вокруг понемногу оживал, и написала короткий план на весь день. Потом быстро собралась и побежала на остановку, где как раз подошёл трамвай, полный бодрых людей. В центре меня уже ждали друзья, мы вместе зашли в маленькую пекарню и взяли горячие булочки с корицей. После завтрака мы пошли гулять по парку, где солнце играло в листве, а вокруг пели птицы и бегали собаки. Я смеялась, снимала всё на телефон и чувствовала, как внутри разгорается радостная энергия. Всё вокруг было ярким, шумным и невероятно живым, а настроение лёгким, как утренний воздух, и таким же свежим.",
+    "photos": [
+      "photo-1.png",
+      "photo-2.png",
+      "photo-3.png"
+    ],
+    "music": {
+      "url": "https://example.com/song-energy",
+      "description": "быстрый электронный трек, мажор",
+      "year": 2019,
+      "genre": "electronic",
+      "tempo_bpm": 128,
+      "energy": 0.85,
+      "mode": "major"
+    }
+  },
+  "title": "Утро, город и солнце",
+  "folder": "2026-11-15_c62bc7ac",
+  "visual": {
+    "schema_version": "1.0",
+    "seed": 2921275223,
+    "light": {
+      "direction_deg": 90,
+      "intensity": 0.68,
+      "temperature_k": 4268
+    },
+    "palette": {
+      "colors": [
+        "#2F9AD1",
+        "#E0573E",
+        "#F4C542",
+        "#FFFFFF"
+      ],
+      "saturation": 0.47
+    },
+    "density": {
+      "value": 0.87,
+      "elements": 11
+    },
+    "texture": {
+      "grain": 0.15,
+      "blur": 0.1,
+      "weather": "none"
+    },
+    "line": {
+      "trajectory": "rising",
+      "amplitude": 0.78,
+      "roughness": 0.73,
+      "color_index": 0
+    },
+    "motion": {
+      "reveal_ms": 2080,
+      "pulse_ms": 600
+    },
+    "contrast": 0.42,
+    "caption": "Утро, город и солнце"
+  },
+  "explain": [
+    {
+      "param": "light.direction_deg",
+      "value": 90,
+      "rule": "R-LIGHT-01",
+      "source": "text.time_of_day",
+      "input": "morning",
+      "text_ru": "Утро в тексте задаёт направление света, как у раннего солнца.",
+      "provenance": "measured"
+    },
+    {
+      "param": "light.intensity",
+      "value": 0.68,
+      "rule": "R-LIGHT-02",
+      "source": "photos.brightness",
+      "input": 0.6907,
+      "text_ru": "Светлые фото делают свет ярче.",
+      "provenance": "measured"
+    },
+    {
+      "param": "light.temperature_k",
+      "value": 4268,
+      "rule": "R-LIGHT-03",
+      "source": "photos.warmth",
+      "input": 0.5873,
+      "text_ru": "Нейтральные цвета фото дают нейтральную температуру света.",
+      "provenance": "measured"
+    },
+    {
+      "param": "palette.colors",
+      "value": [
+        "#2F9AD1",
+        "#E0573E",
+        "#F4C542",
+        "#FFFFFF"
+      ],
+      "rule": "R-PAL-01",
+      "source": "photos.dominant_colors",
+      "input": [
+        "#2F9AD1",
+        "#E0573E",
+        "#F4C542",
+        "#FFFFFF"
+      ],
+      "text_ru": "Цвета взяты из доминирующих цветов фото.",
+      "provenance": "measured"
+    },
+    {
+      "param": "palette.saturation",
+      "value": 0.47,
+      "rule": "R-PAL-02",
+      "source": "photos.contrast",
+      "input": 0.4191,
+      "text_ru": "Умеренный контраст фото даёт сдержанную насыщенность.",
+      "provenance": "measured"
+    },
+    {
+      "param": "density.value",
+      "value": 0.87,
+      "rule": "R-DEN-01",
+      "source": "text.events_count",
+      "input": 5,
+      "text_ru": "В тексте событий: 5, слов: 112. Много событий — композиция плотная.",
+      "provenance": "measured"
+    },
+    {
+      "param": "density.elements",
+      "value": 11,
+      "rule": "R-DEN-02",
+      "source": "density.value",
+      "input": 0.87,
+      "text_ru": "Много элементов — композиция насыщена.",
+      "provenance": "measured"
+    },
+    {
+      "param": "texture.weather",
+      "value": "none",
+      "rule": "R-TEX-01",
+      "source": "text.weather",
+      "input": "sun",
+      "text_ru": "Заметной погоды в тексте нет, фактура без осадков.",
+      "provenance": "measured"
+    },
+    {
+      "param": "texture.grain",
+      "value": 0.15,
+      "rule": "R-TEX-02",
+      "source": "photos.brightness",
+      "input": 0.6907,
+      "text_ru": "Светлые фото получают меньше зерна.",
+      "provenance": "measured"
+    },
+    {
+      "param": "texture.blur",
+      "value": 0.1,
+      "rule": "R-TEX-03",
+      "source": "music.tempo_bpm",
+      "input": 128,
+      "text_ru": "Быстрый темп песни, введённый вами, оставляет изображение чётким.",
+      "provenance": "entered"
+    },
+    {
+      "param": "line.trajectory",
+      "value": "rising",
+      "rule": "R-LINE-01",
+      "source": "text.time_of_day",
+      "input": "morning",
+      "text_ru": "Утро — линия идёт вверх, день только начинается.",
+      "provenance": "measured"
+    },
+    {
+      "param": "line.amplitude",
+      "value": 0.78,
+      "rule": "R-LINE-02",
+      "source": "music.energy",
+      "input": 0.85,
+      "text_ru": "Высокая энергия песни, введённая вами, задаёт большой размах линии.",
+      "provenance": "entered"
+    },
+    {
+      "param": "line.roughness",
+      "value": 0.73,
+      "rule": "R-LINE-03",
+      "source": "music.genre",
+      "input": "electronic",
+      "text_ru": "Жанр, введённый вами, и энергия песни делают линию резче.",
+      "provenance": "entered"
+    },
+    {
+      "param": "line.color_index",
+      "value": 0,
+      "rule": "R-LINE-04",
+      "source": "system",
+      "input": null,
+      "text_ru": "Линия всегда берёт первый цвет палитры, чтобы узнаваться в каждом дне.",
+      "provenance": "measured"
+    },
+    {
+      "param": "motion.reveal_ms",
+      "value": 2080,
+      "rule": "R-MOT-01",
+      "source": "music.tempo_bpm",
+      "input": 128,
+      "text_ru": "Быстрый темп — короткая проявка.",
+      "provenance": "entered"
+    },
+    {
+      "param": "motion.pulse_ms",
+      "value": 600,
+      "rule": "R-MOT-02",
+      "source": "music.tempo_bpm",
+      "input": 128,
+      "text_ru": "Пульс движения соответствует темпу песни.",
+      "provenance": "entered"
+    },
+    {
+      "param": "contrast",
+      "value": 0.42,
+      "rule": "R-CON-01",
+      "source": "music.mode",
+      "input": "major",
+      "text_ru": "Мажорный лад, введённый вами, слегка смягчает контраст фото.",
+      "provenance": "entered"
+    }
+  ]
+}
