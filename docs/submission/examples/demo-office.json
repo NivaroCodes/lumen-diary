@@ -1,0 +1,299 @@
+{
+  "id": "f396aa05-c4ff-4277-b14c-5e08ad55ba37",
+  "title": "Ночь, офис и город",
+  "date": "2026-11-21",
+  "folder": "2026-11-21 Ночь, офис и город",
+  "text": "Офис ночью совсем пустой, только наш стол и огни города за стеклом. Завтра сдача. Работали без перерыва. Написали последние тесты. Сделали открытку заново. Отправили сборку. Позвонили команде. Поужинали холодной пиццей. Кофе остыл. В три часа ночи всё заработало, и мы посмотрели друг на друга молча.",
+  "photos": [
+    "/media/f396aa05-c4ff-4277-b14c-5e08ad55ba37/photo-1.jpg",
+    "/media/f396aa05-c4ff-4277-b14c-5e08ad55ba37/photo-2.jpg"
+  ],
+  "music": {
+    "type": "link",
+    "description": "быстрая, энергичная электроника, тёмная",
+    "source": "link",
+    "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk",
+    "title": null,
+    "artist": null,
+    "year": null,
+    "genre": "electronic",
+    "tempo_bpm": 128,
+    "energy": 0.85,
+    "mode": "minor",
+    "provenance": "entered"
+  },
+  "visual": {
+    "schema_version": "1.0",
+    "seed": 3505988568,
+    "light": {
+      "direction_deg": 0,
+      "intensity": 0.31,
+      "temperature_k": 4691
+    },
+    "palette": {
+      "colors": [
+        "#131521",
+        "#2D4876",
+        "#F7C986",
+        "#7DA4D2",
+        "#CA9851"
+      ],
+      "saturation": 0.44
+    },
+    "density": {
+      "value": 0.85,
+      "elements": 11
+    },
+    "texture": {
+      "grain": 0.42,
+      "blur": 0.1,
+      "weather": "none"
+    },
+    "line": {
+      "trajectory": "flat",
+      "amplitude": 0.78,
+      "roughness": 0.73,
+      "color_index": 0
+    },
+    "motion": {
+      "reveal_ms": 2080,
+      "pulse_ms": 600,
+      "character": "sharp",
+      "scene": "still"
+    },
+    "contrast": 0.54,
+    "caption": "Ночь, офис и город"
+  },
+  "explain": [
+    {
+      "param": "light.direction_deg",
+      "value": 0,
+      "rule": "R-LIGHT-01",
+      "source": "text.time_of_day",
+      "input": "night",
+      "text_ru": "Ночь в тексте — свет сверху, как от лампы или луны.",
+      "provenance": "measured"
+    },
+    {
+      "param": "light.intensity",
+      "value": 0.31,
+      "rule": "R-LIGHT-02",
+      "source": "photos.brightness",
+      "input": 0.1526,
+      "text_ru": "Тёмные фото делают свет приглушённым.",
+      "provenance": "measured"
+    },
+    {
+      "param": "light.temperature_k",
+      "value": 4691,
+      "rule": "R-LIGHT-03",
+      "source": "photos.warmth",
+      "input": 0.476,
+      "text_ru": "Нейтральные цвета фото дают нейтральную температуру света.",
+      "provenance": "measured"
+    },
+    {
+      "param": "palette.colors",
+      "value": [
+        "#131521",
+        "#2D4876",
+        "#F7C986",
+        "#7DA4D2",
+        "#CA9851"
+      ],
+      "rule": "R-PAL-01",
+      "source": "photos.dominant_colors",
+      "input": [
+        "#131521",
+        "#2D4876",
+        "#F7C986",
+        "#7DA4D2",
+        "#CA9851"
+      ],
+      "text_ru": "Цвета взяты из доминирующих цветов фото.",
+      "provenance": "measured"
+    },
+    {
+      "param": "palette.saturation",
+      "value": 0.44,
+      "rule": "R-PAL-02",
+      "source": "photos.contrast",
+      "input": 0.3607,
+      "text_ru": "Умеренный контраст фото даёт сдержанную насыщенность.",
+      "provenance": "measured"
+    },
+    {
+      "param": "density.value",
+      "value": 0.85,
+      "rule": "R-DEN-01",
+      "source": "text.events_count",
+      "input": 7,
+      "text_ru": "В тексте событий: 7, слов: 45. Много событий — композиция плотная.",
+      "provenance": "measured"
+    },
+    {
+      "param": "density.elements",
+      "value": 11,
+      "rule": "R-DEN-02",
+      "source": "density.value",
+      "input": 0.85,
+      "text_ru": "Много элементов — композиция насыщена.",
+      "provenance": "measured"
+    },
+    {
+      "param": "texture.weather",
+      "value": "none",
+      "rule": "R-TEX-01",
+      "source": "text.weather",
+      "input": "none",
+      "text_ru": "Осадков и тумана нет, фактура без штриховки.",
+      "provenance": "measured"
+    },
+    {
+      "param": "texture.grain",
+      "value": 0.42,
+      "rule": "R-TEX-02",
+      "source": "photos.brightness",
+      "input": 0.1526,
+      "text_ru": "Тёмные фото получают больше зерна.",
+      "provenance": "measured"
+    },
+    {
+      "param": "texture.blur",
+      "value": 0.1,
+      "rule": "R-TEX-03",
+      "source": "music.tempo_bpm",
+      "input": 128,
+      "text_ru": "Быстрый темп песни (оценён по описанию или выбран) оставляет изображение чётким.",
+      "provenance": "entered"
+    },
+    {
+      "param": "line.trajectory",
+      "value": "flat",
+      "rule": "R-LINE-01",
+      "source": "text.time_of_day",
+      "input": "night",
+      "text_ru": "Ночь — линия ровная и спокойная.",
+      "provenance": "measured"
+    },
+    {
+      "param": "line.amplitude",
+      "value": 0.78,
+      "rule": "R-LINE-02",
+      "source": "music.energy",
+      "input": 0.85,
+      "text_ru": "Высокая энергия песни (оценена по описанию или выбрана) задаёт большой размах линии.",
+      "provenance": "entered"
+    },
+    {
+      "param": "line.roughness",
+      "value": 0.73,
+      "rule": "R-LINE-03",
+      "source": "music.genre",
+      "input": "electronic",
+      "text_ru": "Жанр (оценён по описанию или выбран) и энергия песни делают линию резче.",
+      "provenance": "entered"
+    },
+    {
+      "param": "line.color_index",
+      "value": 0,
+      "rule": "R-LINE-04",
+      "source": "system",
+      "input": null,
+      "text_ru": "Линия всегда берёт первый цвет палитры, чтобы узнаваться в каждом дне.",
+      "provenance": "measured"
+    },
+    {
+      "param": "motion.reveal_ms",
+      "value": 2080,
+      "rule": "R-MOT-01",
+      "source": "music.tempo_bpm",
+      "input": 128,
+      "text_ru": "Быстрый темп — короткая проявка.",
+      "provenance": "entered"
+    },
+    {
+      "param": "motion.pulse_ms",
+      "value": 600,
+      "rule": "R-MOT-02",
+      "source": "music.tempo_bpm",
+      "input": 128,
+      "text_ru": "Пульс движения соответствует темпу песни.",
+      "provenance": "entered"
+    },
+    {
+      "param": "motion.character",
+      "value": "sharp",
+      "rule": "R-MOT-03",
+      "source": "music.mode",
+      "input": "minor",
+      "text_ru": "Минорный лад (оценён по описанию или выбран) — движение резче, с паузами между волнами.",
+      "provenance": "entered"
+    },
+    {
+      "param": "motion.scene",
+      "value": "still",
+      "rule": "R-MOT-04",
+      "source": "text.weather",
+      "input": "none",
+      "text_ru": "Погоды нет ни в тексте, ни в выборе — сцена неподвижна, двигаются только свет и линия.",
+      "provenance": "unknown"
+    },
+    {
+      "param": "contrast",
+      "value": 0.54,
+      "rule": "R-CON-01",
+      "source": "music.mode",
+      "input": "minor",
+      "text_ru": "Минорный лад (оценён по описанию или выбран) добавляет контраст к контрасту фото.",
+      "provenance": "entered"
+    }
+  ],
+  "profile": {
+    "text": {
+      "time_of_day": "night",
+      "season": "unknown",
+      "environment": "city",
+      "weather": "none",
+      "events_count": 7,
+      "length_words": 45,
+      "keywords": [
+        "офис",
+        "города",
+        "работали",
+        "совсем",
+        "пустой"
+      ]
+    },
+    "photos": {
+      "count": 2,
+      "dominant_colors": [
+        "#131521",
+        "#2D4876",
+        "#F7C986",
+        "#7DA4D2",
+        "#CA9851"
+      ],
+      "brightness": 0.1526,
+      "contrast": 0.3607,
+      "warmth": 0.476
+    },
+    "music": {
+      "source": "link",
+      "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk",
+      "title": null,
+      "artist": null,
+      "year": null,
+      "genre": "electronic",
+      "tempo_bpm": 128,
+      "energy": 0.85,
+      "mode": "minor",
+      "provenance": "entered"
+    },
+    "context": {
+      "weather": null,
+      "weather_source": "text",
+      "place": "Офис команды"
+    }
+  }
+}
