@@ -38,7 +38,7 @@ const dayFormFields = [
   ...musicTextFields.map(({ name }) => name),
   ...musicNumberFields.map(({ name }) => name),
 ]
-// Значения по умолчанию: средний темп и тёмное настроение (уходят в отправку, пока пользователь не сменит выбор).
+// Значения по умолчанию только для отображения (подсветка чипов и карточка), в отправку не уходят.
 const defaultTempo: Tempo = 'medium'
 const defaultMood: Mode = 'minor'
 // Положение капель в картинке «Атмосфера дня» (в координатах viewBox 320×224).
@@ -164,11 +164,12 @@ export default function CreateDayPage() {
   const nextPhotoId = useRef(0)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [pending, setPending] = useState(false)
-  const [tempo, setTempo] = useState<Tempo | undefined>(defaultTempo)
-  const [mood, setMood] = useState<Mode | undefined>(defaultMood)
+  // undefined = пользователь ничего не выбрал: в отправку ничего не уходит, темп и лад берутся из описания.
+  const [tempo, setTempo] = useState<Tempo>()
+  const [mood, setMood] = useState<Mode>()
   const submitting = useRef(false)
   const errorFocus = useRef<string | null>(null)
-  // Сброс выбора возвращает значения по умолчанию, как и в начальном состоянии.
+  // Только отображение: карточка и подсветка чипов показывают умолчания, но в отправку они не попадают.
   const tempoValue: Tempo = tempo ?? defaultTempo
   const moodValue: Mode = mood ?? defaultMood
 
@@ -389,7 +390,7 @@ export default function CreateDayPage() {
                       <span id="music-tempo-label" className="lm-small">Темп</span>
                       <div className="lm-chips">
                         {tempoOptions.map(({ value, label }) => (
-                          <button key={value} type="button" aria-pressed={tempo === value} className="lm-chip"
+                          <button key={value} type="button" aria-pressed={tempoValue === value} className="lm-chip"
                             onClick={() => { setTempo(tempo === value ? undefined : value); setErrors((p) => ({ ...p, music_tempo_bpm: '', music_energy: '' })) }}>
                             {label}
                           </button>
@@ -402,7 +403,7 @@ export default function CreateDayPage() {
                       <span id="music-mood-label" className="lm-small">Настроение</span>
                       <div className="lm-chips">
                         {moodOptions.map(({ value, label }) => (
-                          <button key={value} type="button" aria-pressed={mood === value} className="lm-chip"
+                          <button key={value} type="button" aria-pressed={moodValue === value} className="lm-chip"
                             onClick={() => { setMood(mood === value ? undefined : value); setErrors((p) => ({ ...p, music_mode: '' })) }}>
                             {label}
                           </button>
